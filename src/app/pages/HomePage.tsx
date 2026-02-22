@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { motion, AnimatePresence } from 'motion/react';
 import { testimonials } from '../data/products';
-import Banner from '../../assets/Dark.jpeg';
+import Banner from '../../assets/UpdatedBanner.png';
 import GoldenImage from '../../assets/goldenImage.jpg';
 
 interface Product {
@@ -279,8 +279,9 @@ export function HomePage() {
               Discover our handpicked selection of premium gifts
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {featuredProducts.map((product, index) => (
+
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -299,11 +300,11 @@ export function HomePage() {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="mb-2 line-clamp-1">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {/* <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {product.description}
-                      </p>
-                      <div className="flex justify-between items-center mt-auto">
-                        <span className="font-bold text-accent">₹{product.price}</span>
+                      </p> */}
+                      <div className="flex justify-end items-center mt-auto">
+                        {/* <span className="font-bold text-accent">₹{product.price}</span> */}
                         <Button variant="outline" size="sm">
                           View Details
                         </Button>
@@ -314,7 +315,20 @@ export function HomePage() {
               </motion.div>
             ))}
           </div>
+          {/* <div className="text-center p-8 bg-accent/5 rounded-2xl border border-accent/20 max-w-3xl mx-auto">
+            <h3 className="text-2xl font-bold text-primary mb-2">Customization & Bulk Orders Available</h3>
+            <p className="text-muted-foreground mb-6">Contact us today to discuss your specific requirements and get exclusive bulk pricing.</p>
+            <div className="flex justify-center gap-4">
+              <Link to="/quote">
+                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">Request Quote</Button>
+              </Link>
+              <Link to="/contact">
+                <Button variant="outline">Contact Support</Button>
+              </Link>
+            </div>
+          </div> */}
           {!loading && featuredProducts.length === 0 && (
+
             <div className="text-center py-10 text-muted-foreground">
               New products coming soon!
             </div>

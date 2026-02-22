@@ -91,40 +91,46 @@ export function CategoryPage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           {category.products && category.products.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {category.products.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                >
-                  <Link to={`/products/${product.id}`}>
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-                      <div className="h-56 overflow-hidden bg-muted">
-                        <img
-                          src={product.image?.startsWith('/uploads') ? `${apiBaseUrl}${product.image}` : product.image || 'https://placehold.co/600x400?text=No+Image'}
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <CardContent className="p-6 flex-1 flex flex-col">
-                        <h3 className="mb-2">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-4 flex-1">
-                          {product.description}
-                        </p>
-                        <div className="flex justify-between items-center mt-auto">
-                          <span className="font-bold text-accent">₹{product.price}</span>
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
+            <>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {category.products.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                  >
+                    <Link to={`/products/${product.id}`}>
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
+                        <div className="h-56 overflow-hidden bg-muted">
+                          <img
+                            src={product.image?.startsWith('/uploads') ? `${apiBaseUrl}${product.image}` : product.image || 'https://placehold.co/600x400?text=No+Image'}
+                            alt={product.name}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                        <CardContent className="p-6 flex-1 flex flex-col">
+                          <h3 className="mb-2">{product.name}</h3>
+                          {/* <p className="text-sm text-muted-foreground mb-4 flex-1">
+                            {product.description}
+                          </p> */}
+                          <div className="flex justify-end items-center mt-auto">
+                            {/* <span className="font-bold text-accent">₹{product.price}</span> */}
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-12 text-center p-8 bg-muted/50 rounded-xl border border-border">
+                <h3 className="text-2xl font-semibold mb-2">Customization & Bulk Orders Available</h3>
+                <p className="text-muted-foreground">Contact us today for personalized gifting solutions and bulk order discounts!</p>
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-xl text-muted-foreground mb-6">

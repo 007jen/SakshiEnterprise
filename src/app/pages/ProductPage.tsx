@@ -1,21 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Seo } from '../components/SEO';
-import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, MessageCircle, ShoppingBag, Plus, Minus, Loader2, Mail, Info } from 'lucide-react';
+import { CheckCircle, MessageCircle, ShoppingBag, Plus, Minus, Loader2 } from 'lucide-react';
 import { useQuote } from '../context/QuoteContext';
 import { motion } from 'motion/react';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../components/ui/dialog";
+
 
 interface Product {
   id: string;
@@ -110,7 +101,8 @@ export function ProductPage() {
   const handleWhatsApp = () => {
     const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
     // Strip any non-digit characters (like +, -, spaces)
-    const phoneNumber = rawNumber.replace(/\D/g, '');
+    const phoneNumber = rawNumber.replaceAll(/\D/g, '');
+
 
     // Ensure we have a valid number and it starts with 91 for India if not already present
     const formattedNumber = phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`;
@@ -155,30 +147,17 @@ export function ProductPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="mb-6">
-              {product.inStock ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
-                  <CheckCircle size={14} className="mr-1" />
-                  In Stock
-                </Badge>
-              ) : (
-                <div className="space-y-4">
-                  <Badge variant="destructive" className="animate-pulse">Out of Stock</Badge>
-                  <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription className="font-medium">
-                      Product is out of stock it will restocked soon
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              )}
             </div>
+
             <h1 className="text-4xl mb-4">{product.name}</h1>
-            <p className="text-lg text-muted-foreground mb-8">{product.description}</p>
+            <p className="text-lg text-muted-foreground mb-4">{product.description}</p>
+
+
 
             {/* Customization Options */}
             <Card className="mb-8">
               <CardContent className="p-6">
-                <h3 className="mb-4">Customization Options</h3>
+                <h3 className="mb-4 text-xl">Customization Options</h3>
                 <div className="space-y-2">
                   {customizationOptions.map((option) => (
                     <div key={option} className="flex items-center space-x-2">
@@ -218,82 +197,31 @@ export function ProductPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {product.inStock ? (
-                  <>
-                    <Button
-                      size="lg"
-                      className="bg-accent hover:bg-accent/90 text-accent-foreground w-full"
-                      onClick={() => addToQuote(product, quantity)}
-                    >
-                      <ShoppingBag className="mr-2" size={20} />
-                      Add to Quote
-                    </Button>
+                <Button
+                  size="lg"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground w-full"
+                  onClick={() => addToQuote(product, quantity)}
+                >
+                  <ShoppingBag className="mr-2" size={20} />
+                  Add to Quote
+                </Button>
 
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleWhatsApp}
-                    >
-                      <MessageCircle className="mr-2" size={20} />
-                      WhatsApp
-                    </Button>
-                  </>
-                ) : (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="lg"
-                        className="bg-accent hover:bg-accent/90 text-accent-foreground w-full col-span-full"
-                      >
-                        <MessageCircle className="mr-2" size={20} />
-                        Inquire Now
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Product Inquiry</DialogTitle>
-                        <DialogDescription>
-                          This product is currently out of stock. How would you like to contact us?
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid grid-cols-1 gap-4 py-4">
-                        <Button
-                          onClick={handleWhatsApp}
-                          className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white"
-                        >
-                          <MessageCircle className="mr-2" size={20} />
-                          Chat on WhatsApp (Fastest)
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            const email = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',')[0].trim();
-                            window.location.href = `mailto:${email}?subject=Product Inquiry: ${product.name}&body=Hi, I am interested in ${product.name} which is currently out of stock. Please let me know when it will be restocked.`;
-                          }}
-                          className="w-full"
-                        >
-                          <Mail className="mr-2" size={20} />
-                          Send an Email
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleWhatsApp}
+                >
+                  <MessageCircle className="mr-2" size={20} />
+                  WhatsApp
+                </Button>
               </div>
             </div>
+            <p className="text-xl font-bold text-accent mb-8">
+              Customization & bulk orders available. Contact us today!
+            </p>
 
-            {/* Additional Info */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-muted-foreground mb-1">Minimum Order</p>
-                <p>50 units</p>
-              </div>
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-muted-foreground mb-1">Delivery Time</p>
-                <p>7-14 days</p>
-              </div>
-            </div>
+            {/* Additional Info removed as requested */}
           </motion.div>
         </div>
 
@@ -344,11 +272,11 @@ export function ProductPage() {
                   </div>
                   <CardContent className="p-4">
                     <h3 className="mb-2 line-clamp-1">{relatedProduct.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    {/* <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {relatedProduct.description}
-                    </p>
-                    <div className="flex justify-between items-center mt-auto">
-                      <span className="font-bold text-accent">₹{relatedProduct.price}</span>
+                    </p> */}
+                    <div className="flex justify-end items-center mt-auto">
+                      {/* <span className="font-bold text-accent">₹{relatedProduct.price}</span> */}
                       <Button variant="outline" size="sm">
                         View Details
                       </Button>

@@ -649,12 +649,15 @@ export default function AdminPage() {
 
                                             <div className="space-y-2">
                                                 <Label htmlFor="tags">Tags (comma separated)</Label>
-                                                <Input
+                                                {/* <Input
                                                     id="tags"
                                                     value={productForm.tags}
                                                     onChange={(e) => setProductForm({ ...productForm, tags: e.target.value })}
                                                     placeholder="e.g. Bulk, Premium, Eco, New Arrival"
-                                                />
+                                                /> */}
+                                                <div className="mt-2 text-xs font-semibold text-accent p-2 bg-accent/5 border border-accent/20 rounded">
+                                                    Customization & bulk orders available. Contact us today!
+                                                </div>
                                             </div>
 
                                             <div className="flex justify-end gap-3 mt-6">
@@ -701,15 +704,16 @@ export default function AdminPage() {
                                                 <span className="font-bold text-accent">₹{product.price}</span>
                                             </div>
 
-                                            {product.tags && product.tags.length > 0 && (
-                                                <div className="flex flex-wrap gap-1 mb-4">
-                                                    {product.tags.map(tag => (
-                                                        <span key={tag} className="text-[9px] bg-accent/5 text-accent border border-accent/20 px-1.5 py-0.5 rounded">
-                                                            #{tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
+                                            <div className="flex flex-wrap gap-1 mb-4">
+                                                <span className="text-[9px] bg-accent/10 text-accent border border-accent/30 px-1.5 py-0.5 rounded font-semibold italic">
+                                                    Customization & bulk orders available
+                                                </span>
+                                                {product.tags && product.tags.length > 0 && product.tags.map(tag => (
+                                                    <span key={tag} className="text-[9px] bg-accent/5 text-accent border border-accent/20 px-1.5 py-0.5 rounded">
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
                                             <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                                                 {product.description || 'No description provided.'}
                                             </p>

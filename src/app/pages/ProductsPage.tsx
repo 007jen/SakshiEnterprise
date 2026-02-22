@@ -93,21 +93,21 @@ export function ProductsPage() {
                                                         alt={product.name}
                                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                     />
-                                                    {!product.inStock && (
+                                                    {/* {!product.inStock && (
                                                         <Badge className="absolute top-3 right-3 bg-red-500 text-white backdrop-blur-sm shadow-sm">
                                                             Out of Stock
                                                         </Badge>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                                 <CardContent className="p-5">
                                                     <h3 className="font-semibold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
                                                         {product.name}
                                                     </h3>
-                                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
+                                                    {/* <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                                                         {product.description}
-                                                    </p>
-                                                    <div className="flex justify-between items-center mt-auto">
-                                                        <span className="font-bold text-accent">₹{product.price}</span>
+                                                    </p> */}
+                                                    <div className="flex justify-end items-center mt-auto">
+                                                        {/* <span className="font-bold text-accent">₹{product.price}</span> */}
                                                         <Button variant="ghost" size="sm" className="group/btn hover:bg-primary hover:text-primary-foreground">
                                                             View Details
                                                             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -117,6 +117,11 @@ export function ProductsPage() {
                                             </Card>
                                         </Link>
                                     ))}
+                                </div>
+                                <div className="mt-8 text-center p-6 bg-muted/30 rounded-lg border border-border/50">
+                                    <p className="text-lg font-medium text-primary">
+                                        Customization & bulk orders available. Contact us today for special pricing!
+                                    </p>
                                 </div>
                             </section>
                         );
