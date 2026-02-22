@@ -51,7 +51,16 @@ const submissionLimiter = rateLimit({
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
-app.use(cors());
+const allowedOrigins = [
+    'https://www.nishyash.com',
+    'https://nishyash.com',
+    FRONTEND_URL
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 app.use(generalLimiter);
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ limit: '50kb', extended: true }));
