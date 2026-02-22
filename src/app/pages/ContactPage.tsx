@@ -115,9 +115,9 @@ export function ContactPage() {
                       <h3 className="mb-2">Visit Us</h3>
                       <p className="text-muted-foreground">
                         Nishyash Corporation<br />
-                        Business Center, Andheri East<br />
-                        Mumbai, Maharashtra 400059<br />
-                        India
+                        Business Center,Flat no.28, <br />
+                        Humlog Society, Kandivali West, <br />
+                        Mumbai, Maharashtra 400067,India
                       </p>
                     </div>
                   </div>

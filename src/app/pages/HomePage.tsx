@@ -119,12 +119,12 @@ export function HomePage() {
                   </p>
 
                   <div className="flex flex-wrap gap-4 pt-4 justify-center">
-                    <Link to={slides[currentSlide].ctaLink}>
+                    {/* <Link to={slides[currentSlide].ctaLink}>
                       <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-6 h-auto transition-all rounded-full min-w-[200px]">
                         {slides[currentSlide].ctaText}
                         <ArrowRight className="ml-2" size={20} />
                       </Button>
-                    </Link>
+                    </Link> */}
                     <Link to="/products">
                       <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/5 text-lg px-8 py-6 h-auto transition-all rounded-full min-w-[200px]">
                         Explore Products
