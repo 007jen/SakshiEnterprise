@@ -67,7 +67,7 @@ export function LandingPage() {
     const adminEmails = adminEmail.split(',').map(e => e.trim().toLowerCase());
     const isAdmin = !!user && adminEmails.includes(user.primaryEmailAddress?.emailAddress?.toLowerCase() || '');
 
-    /* useEffect(() => {
+    useEffect(() => {
         const unlockTime = localStorage.getItem('nishyash_gateway_unlock');
         if (unlockTime) {
             const now = Date.now();
@@ -78,7 +78,7 @@ export function LandingPage() {
                 localStorage.removeItem('nishyash_gateway_unlock');
             }
         }
-    }, [navigate]); */
+    }, [navigate]);
 
     const handleBeginJourney = () => {
         // Always trigger the chatbot
