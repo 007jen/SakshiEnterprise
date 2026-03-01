@@ -87,7 +87,7 @@ export function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative w-full bg-background pt-24">
+      <section className="relative w-full bg-background pt-14 sm:pt-16 lg:pt-20">
         <div className="flex flex-col">
           {/* Text Content */}
           <div className="w-full relative z-10 mb-20">

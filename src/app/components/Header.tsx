@@ -8,7 +8,7 @@ import {
   UserButton,
   useUser,
 } from "@clerk/clerk-react";
-import { Menu, X, Search, ShoppingBag, Briefcase, Heart, Gift, Shirt, Coffee, FolderOpen, Award, Leaf } from 'lucide-react';
+import { Menu, X, Search, ShoppingBag, Briefcase, Heart, Gift, Shirt, Coffee, FolderOpen, Award, Leaf, User as UserIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   NavigationMenu,
@@ -259,8 +259,8 @@ export function Header() {
             </SignedIn>
           </div>
 
-          {/* Mobile Actions (Visible on small screens) */}
-          <div className="flex lg:hidden items-center space-x-5 mr-1">
+          {/* Mobile Actions & Menu (Visible on small screens) */}
+          <div className="flex lg:hidden items-center space-x-4">
             <Link to="/quote" className="text-accent hover:text-white transition-colors relative">
               <ShoppingBag size={24} />
               {quoteCount > 0 && (
@@ -276,16 +276,21 @@ export function Header() {
                 }
               }} />
             </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="text-accent hover:text-white transition-colors flex items-center justify-center">
+                  <UserIcon size={24} />
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <button
+              className="text-accent"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden text-accent"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
 
         {/* Mobile Menu */}

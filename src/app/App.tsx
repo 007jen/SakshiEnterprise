@@ -23,11 +23,11 @@ const GatewayGuard = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
   const { isLoaded: isAuthLoaded } = useAuth();
 
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
-  const adminEmails = adminEmail.split(',').map(e => e.trim().toLowerCase());
-  const isAdmin = !!user && adminEmails.includes(user.primaryEmailAddress?.emailAddress?.toLowerCase() || '');
+  // const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
+  // const adminEmails = adminEmail.split(',').map(e => e.trim().toLowerCase());
+  // const isAdmin = !!user && adminEmails.includes(user.primaryEmailAddress?.emailAddress?.toLowerCase() || '');
 
-  const isUnlocked = (() => {
+  /* const isUnlocked = (() => {
     const unlockTime = localStorage.getItem('nishyash_gateway_unlock');
     if (!unlockTime) return false;
 
@@ -39,7 +39,7 @@ const GatewayGuard = () => {
       return false;
     }
     return true;
-  })();
+  })(); */
 
   if (!isUserLoaded || !isAuthLoaded) {
     return (
@@ -50,11 +50,11 @@ const GatewayGuard = () => {
   }
 
   // Allow admin bypass or session-unlocked users, otherwise redirect to landing page
-  if (isAdmin || isUnlocked) {
-    return <Outlet />;
-  }
+  // if (isAdmin || isUnlocked) {
+  return <Outlet />;
+  // }
 
-  return <Navigate to="/" replace />;
+  // return <Navigate to="/" replace />;
 };
 
 export default function App() {

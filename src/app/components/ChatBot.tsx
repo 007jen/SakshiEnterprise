@@ -254,8 +254,14 @@ export function ChatBot() {
             return;
         }
 
-        setIsTyping(true);
+        // IMMEDIATE ACTIONS: Unlock, Navigate, and Close
+        const now = Date.now();
+        localStorage.setItem('nishyash_gateway_unlock', now.toString());
+        setIsOpen(false);
+        navigate('/home');
+        toast.success("Welcome! Access granted.");
 
+        // BACKGROUND ACTION: API submission
         const payload = {
             firstName: formData.leadInfo.name.split(' ')[0] || 'Chatbot',
             lastName: formData.leadInfo.name.split(' ').slice(1).join(' ') || 'Lead',
@@ -274,27 +280,15 @@ Company: ${formData.leadInfo.company}
             `.trim()
         };
 
-        try {
-            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiBaseUrl}/api/leads`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                const now = new Date().getTime();
-                localStorage.setItem('nishyash_gateway_unlock', now.toString());
-                nextStep('success');
-            } else {
-                toast.error('Something went wrong. Please talk to an expert.');
-            }
-        } catch (error) {
-            console.error('Chatbot lead capture error:', error);
-            handleWhatsAppRedirect("Hi, I tried submitting the contact form on your chatbot but it failed. I need information about corporate gifting.");
-        } finally {
-            setIsTyping(false);
-        }
+        // Fire and forget
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        fetch(`${apiBaseUrl}/api/leads`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(error => {
+            console.error('Chatbot background lead capture error:', error);
+        });
     };
 
     return (
@@ -407,7 +401,7 @@ Company: ${formData.leadInfo.company}
                                                                 </div>
                                                             </div>
                                                             <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground gap-2 h-12 md:h-14 text-base md:text-lg font-medium rounded-xl transition-all">
-                                                                Submit & Request Quote <Send size={18} />
+                                                                Submit & Enter Site <Send size={18} />
                                                             </Button>
                                                         </form>
                                                     )}
