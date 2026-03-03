@@ -54,7 +54,7 @@ const submissionLimiter = rateLimit({
 });
 
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // CRITICAL: Allow cross-origin requests
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
@@ -63,25 +63,42 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://*.clerk.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            frameAncestors: ["'none'"], // Protects against Clickjacking
+            frameAncestors: ["'none'"],
         },
     },
-    crossOriginOpenerPolicy: { policy: "same-origin" },
-    crossOriginEmbedderPolicy: { policy: "credentialless" }, // Flexible for Cloudinary images
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginEmbedderPolicy: false,
 }));
+
 const rawFrontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 const sanitizedFrontendUrl = rawFrontendUrl.endsWith('/') ? rawFrontendUrl.slice(0, -1) : rawFrontendUrl;
 
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
-    sanitizedFrontendUrl
+    sanitizedFrontendUrl,
+    'https://sakshi-enterprise.vercel.app' // Explicitly add specific vercel URL as fallback
 ];
 
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
+            callback(null, true);
+        } else {
+            console.log('Blocked by CORS:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept']
 }));
+
+// Explicitly handle OPTIONS reqs for preflight
+app.options('*', cors());
 app.use(generalLimiter);
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ limit: '50kb', extended: true }));
