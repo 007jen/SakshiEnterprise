@@ -266,7 +266,7 @@ export function Header() {
 
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-[#1b4332]">
+                <Button className="bg-[#2d6a4f] hover:bg-[#2d6a4f]/90 text-white font-semibold">
                   Login
                 </Button>
               </SignInButton>
@@ -381,13 +381,7 @@ export function Header() {
               >
                 Home
               </Link>
-              <Link
-                to="/about"
-                className="text-primary hover:text-primary/80 transition-colors py-2 font-medium text-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </Link>
+
 
               <div className="py-2">
                 <span className="text-primary font-semibold block mb-2 text-lg">Products</span>
