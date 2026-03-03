@@ -130,7 +130,7 @@ export function LandingPage() {
                         </motion.div>
 
                         <motion.h1
-                            className="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] mb-4 font-bold text-primary py-4"
+                            className="text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] mb-4 font-serif font-semibold tracking-wide text-primary py-4"
                         >
                             Sakshi Enterprise
                         </motion.h1>

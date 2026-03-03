@@ -123,7 +123,7 @@ export function Header() {
           <Link to="/home" className="flex items-center space-x-1 sm:space-x-1 flex-shrink min-w-0">
             <img src={Logo} alt="Sakshi Enterprise" className="h-10 sm:h-16 lg:h-20 w-auto object-contain flex-shrink-0" />
             <div className="flex flex-col min-w-0 overflow-visible">
-              <span className="text-xs sm:text-2xl lg:text-5xl font-bold text-white font-script whitespace-nowrap leading-tight">Sakshi Enterprise</span>
+              <span className="text-sm sm:text-xl lg:text-3xl font-semibold tracking-wide text-white font-serif whitespace-nowrap leading-tight">Sakshi Enterprise</span>
             </div>
           </Link>
 

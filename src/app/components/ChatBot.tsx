@@ -312,7 +312,7 @@ GST Number: ${formData.leadInfo.gstNumber}
                                                 <Package size={18} className="text-primary" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-base md:text-xl font-script text-white">Welcome to Sakshi Enterprise</CardTitle>
+                                                <CardTitle className="text-base md:text-lg font-serif tracking-wide text-white mt-1">Welcome to Sakshi Enterprise</CardTitle>
                                                 <div className="flex items-center gap-1.5 leading-none mt-0.5">
                                                     <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse" />
                                                     <span className="text-[8px] md:text-[10px] text-white/70 uppercase tracking-widest font-medium">Always Online</span>
