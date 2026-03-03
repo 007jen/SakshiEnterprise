@@ -69,10 +69,13 @@ app.use(helmet({
     crossOriginOpenerPolicy: { policy: "same-origin" },
     crossOriginEmbedderPolicy: { policy: "credentialless" }, // Flexible for Cloudinary images
 }));
+const rawFrontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+const sanitizedFrontendUrl = rawFrontendUrl.endsWith('/') ? rawFrontendUrl.slice(0, -1) : rawFrontendUrl;
+
 const allowedOrigins = [
+    'http://localhost:5173',
     'http://localhost:5174',
-    'https://localhost:5173',
-    FRONTEND_URL
+    sanitizedFrontendUrl
 ];
 
 app.use(cors({
