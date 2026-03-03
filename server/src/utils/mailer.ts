@@ -18,9 +18,11 @@ export const sendNotificationEmail = async (subject: string, html: string, toEma
     }
 
     try {
-        const adminEmails = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || 'jajoshi2005@gmail.com';
+        const adminEmails = process.env.ADMIN_EMAIL || 'sales.it@sakshient.com';
 
-        const recipients = ['joshijenil12@gmail.com']; // Admin
+        // Split admin emails if multiple provided, otherwise use the official sales email
+        const recipients = adminEmails.split(',').map(e => e.trim());
+
         if (toEmail) {
             recipients.push(toEmail); // Customer
         }
