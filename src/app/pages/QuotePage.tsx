@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, Trash2, ShoppingBag, ArrowRight, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Trash2, ShoppingBag, ArrowRight, Lock } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser, useAuth, SignInButton } from '@clerk/clerk-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -13,7 +13,7 @@ import { useQuote } from '../context/QuoteContext';
 export function QuotePage() {
   const { isSignedIn, user, isLoaded } = useUser();
   const { getToken } = useAuth();
-  const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { items, removeFromQuote, clearQuote } = useQuote();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -36,6 +36,8 @@ export function QuotePage() {
       }));
     }
   }, [user]);
+
+  const orderTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +71,8 @@ export function QuotePage() {
       });
 
       if (response.ok) {
-        setSubmitted(true);
         clearQuote();
+        navigate('/payment', { state: { total: orderTotal } });
       } else {
         const err = await response.json();
         if (response.status === 429) {
@@ -96,38 +98,6 @@ export function QuotePage() {
     setFormData((prev) => ({ ...prev, [field]: sanitizedValue }));
   };
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen pt-32 pb-20 bg-[#f0fdf4]">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl mx-auto"
-          >
-            <Card className="text-center">
-              <CardContent className="pt-12 pb-12">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="text-green-600" size={48} />
-                </div>
-                <h1 className="text-4xl mb-4">Request Received!</h1>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Your quote request has been successfully submitted. Our team will review your requirements and get back to you within 24 hours.
-                </p>
-                <Link to="/home">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
-                    Back to Home
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
   // --- EMPTY STATE ---
   if (items.length === 0) {
     return (
@@ -136,9 +106,9 @@ export function QuotePage() {
           <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="text-muted-foreground" size={48} />
           </div>
-          <h1 className="text-3xl mb-4">Your Quote Cart is Empty</h1>
+          <h1 className="text-3xl mb-4">Your Cart is Empty</h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            It looks like you haven't added any products to your quote request yet. Browse our collections to find the perfect wellness products.
+            It looks like you haven't added any products to your cart yet. Browse our collections to find the perfect wellness products.
           </p>
           <Link to="/products">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
@@ -155,8 +125,8 @@ export function QuotePage() {
     <div className="min-h-screen pt-32 pb-20 bg-[#f0fdf4]">
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
-          <h1 className="text-4xl mb-3">Finalize Your Quote Request</h1>
-          <p className="text-muted-foreground">Review your items and provide your contact details</p>
+          <h1 className="text-4xl mb-3">Checkout</h1>
+          <p className="text-muted-foreground">Review your cart items and provide your delivery details</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
@@ -168,15 +138,15 @@ export function QuotePage() {
             className="space-y-6"
           >
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-semibold">Selected Items ({items.length})</h2>
+              <h2 className="text-xl font-semibold">Shopping Cart ({items.length})</h2>
               <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={clearQuote}>
-                Clear All
+                Clear Cart
               </Button>
             </div>
 
             <div className="space-y-4">
               {items.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
+                <Card key={item.id} className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex flex-col sm:flex-row">
                     <div className="sm:w-32 h-32 bg-gray-100 overflow-hidden">
                       <img
@@ -188,21 +158,22 @@ export function QuotePage() {
                     <div className="p-4 flex-1 flex flex-col justify-between">
                       <div className="flex justify-between items-start gap-2">
                         <div>
-                          <h3 className="font-medium text-lg leading-tight mb-1">{item.name}</h3>
-                          {item.category && (
-                            <p className="text-sm text-muted-foreground">{item.category.name}</p>
-                          )}
+                          <h3 className="font-medium text-lg leading-tight mb-1 line-clamp-1">{item.name}</h3>
+                          <p className="text-accent font-bold">₹{item.price}</p>
                         </div>
                         <button
                           onClick={() => removeFromQuote(item.id)}
-                          className="text-muted-foreground hover:text-red-500 transition-colors"
+                          className="text-muted-foreground hover:text-red-500 transition-colors bg-red-50 p-2 rounded-full"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm bg-muted px-3 py-1 rounded-full">
-                          Qty: <span className="font-semibold">{item.quantity}</span>
+                      <div className="flex items-center justify-between mt-4 border-t pt-3">
+                        <div className="text-sm">
+                          Quantity: <span className="font-semibold bg-primary/10 px-2 py-1 rounded">{item.quantity}</span>
+                        </div>
+                        <div className="text-sm font-semibold">
+                          Subtotal: <span className="text-primary">₹{item.price * item.quantity}</span>
                         </div>
                       </div>
                     </div>
@@ -210,6 +181,16 @@ export function QuotePage() {
                 </Card>
               ))}
             </div>
+
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center text-lg font-bold">
+                  <span>Order Total</span>
+                  <span className="text-2xl text-accent">₹{orderTotal}</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">Shipping and taxes calculated at checkout if applicable.</p>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* RIGHT COL: Contact Form or Auth CTA */}
@@ -247,7 +228,7 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
           </div>
           <CardTitle className="text-2xl text-primary">Sign In Required</CardTitle>
           <CardDescription className="text-base mt-2">
-            To maintain order history and secure your quote, please sign in to your Sakshi Enterprise account.
+            To maintain order history and secure your checkout, please sign in to your Sakshi Enterprise account.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-10 pb-10 flex flex-col items-center">
@@ -269,7 +250,7 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
       <CardHeader>
         <CardTitle className="text-primary">Contact Details</CardTitle>
         <CardDescription>
-          Where should we send the quotation, {user?.firstName}?
+          Where should we send the order confirmation, {user?.firstName}?
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -341,7 +322,7 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
             disabled={isSubmitting}
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
           >
-            {isSubmitting ? 'Processing Quote...' : 'Submit Request'}
+            {isSubmitting ? 'Processing Order...' : 'Submit Order'}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">

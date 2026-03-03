@@ -10,7 +10,7 @@ import { Label } from './ui/label';
 import { toast } from 'sonner';
 import { getWhatsAppLink } from '../utils/helpers';
 
-type Step = 'welcome' | 'purpose' | 'quantity' | 'budget' | 'customization' | 'delivery' | 'preferences' | 'lead-capture' | 'success';
+type Step = 'welcome' | 'buyer_type' | 'product_interest' | 'quantity' | 'budget' | 'gst' | 'lead-capture' | 'success';
 
 interface ChatMessage {
     id: string;
@@ -27,17 +27,19 @@ export function ChatBot() {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [formData, setFormData] = useState({
-        purpose: '',
+        inquiryType: '',
+        buyerType: '',
+        productInterest: [] as string[],
         quantity: '',
         budget: '',
-        customization: '',
-        delivery: '',
-        preferences: [] as string[],
+        gst: '',
         leadInfo: {
             name: '',
-            company: '',
+            company: '', // Maps to Business Name
             mobile: '',
-            email: ''
+            email: '',
+            location: '',
+            gstNumber: ''
         }
     });
 
@@ -68,7 +70,7 @@ export function ChatBot() {
     };
 
     const handleWhatsAppRedirect = (customMessage?: string) => {
-        const defaultMsg = "Hi, I would like to talk to a wellness expert about my Ayurvedic and healthcare requirements.";
+        const defaultMsg = "Hi, I would like to talk to a  expert about my Ayurvedic and healthcare requirements.";
         const whatsappLink = getWhatsAppLink(rawNumber, customMessage || defaultMsg);
         if (whatsappLink) {
             globalThis.open(whatsappLink, '_blank');
@@ -84,14 +86,14 @@ export function ChatBot() {
                 setIsTyping(false);
                 addMessage({
                     type: 'bot',
-                    text: "Hello 👋 Welcome to Sakshi Enterprise. We are a trusted supplier of Ayurvedic and healthcare wellness products. How can I assist you today?",
+                    text: "🌿 Welcome to Sakshi Enterprise\nEstablished in 2009, we are a trusted name in Ayurvedic and selected healthcare products. We are committed to delivering natural wellness solutions and quality healthcare essentials to customers across India through our online platform.\n\nWe believe in combining the wisdom of Ayurveda with modern distribution efficiency to ensure safe, reliable, and effective products reach every home.",
                     options: [
-                        { label: '👉 Explore products', value: 'continue' },
-                        { label: '👉 Enter site directly', value: 'enter', action: () => { navigate('/home'); } },
-                        { label: '👉 Talk to a wellness expert', value: 'expert', action: () => handleWhatsAppRedirect() }
+                        { label: '👉 Explore Products', value: 'continue' },
+                        // { label: '👉 Enter Site Directly', value: 'enter', action: () => { navigate('/home'); } },
+                        { label: '👉 Talk to an Expert', value: 'expert', action: () => handleWhatsAppRedirect() }
                     ]
                 });
-            }, 1000);
+            }, 1500);
         }
     };
 
@@ -102,96 +104,82 @@ export function ChatBot() {
         setTimeout(() => {
             setIsTyping(false);
             switch (step) {
-                case 'purpose':
-                    if (prevValue === 'continue') {
-                        addMessage({
-                            type: 'bot',
-                            text: 'Great! What is your specific wellness requirement?',
-                            options: [
-                                { label: 'Ayurvedic Preparations', value: 'ayurvedic' },
-                                { label: 'Immunity Boosters', value: 'immunity' },
-                                { label: 'Selected Surgical Items', value: 'surgical' },
-                                { label: 'OTC Wellness Products', value: 'otc' },
-                                { label: 'Pain Relief Oils & Balms', value: 'relief' },
-                                { label: 'Bulk Healthcare Supply', value: 'bulk' }
-                            ]
-                        });
-                    }
+                case 'buyer_type':
+                    addMessage({
+                        type: 'bot',
+                        text: 'Great! What type of buyer are you?',
+                        options: [
+                            { label: 'Retail Medical Store', value: 'medical_store' },
+                            { label: 'Ayurvedic Store', value: 'ayurvedic_store' },
+                            { label: 'Distributor / Wholesaler', value: 'distributor' },
+                            { label: 'Online Seller', value: 'online_seller' },
+                            { label: 'Corporate Buyer', value: 'corporate' },
+                            { label: 'Hospital / Clinic', value: 'hospital' }
+                        ]
+                    });
+                    break;
+                case 'product_interest':
+                    addMessage({
+                        type: 'bot',
+                        text: 'Which products are you interested in? (You can select multiple)',
+                        options: [
+                            { label: '🌿 Ayurvedic Kadha', value: 'kadha' },
+                            { label: '💆 Ayurvedic Pain Relief Oil', value: 'pain_oil' },
+                            { label: '💊 Herbal Immunity Boosters', value: 'immunity' },
+                            { label: '🧴 Pain Balm', value: 'balm' },
+                            { label: '🩺 Surgical Items', value: 'surgical' },
+                            { label: '📦 All Products', value: 'all' },
+                            { label: 'Next 👉', value: 'next' }
+                        ]
+                    });
                     break;
                 case 'quantity':
                     addMessage({
                         type: 'bot',
-                        text: 'Wonderful choice! We have curated solutions for this category. How many gifts do you need?',
+                        text: 'What is your approximate monthly requirement?',
                         options: [
-                            { label: 'Under 50', value: '<50' },
-                            { label: '50 – 200', value: '50-200' },
-                            { label: '200 – 500', value: '200-500' },
-                            { label: '500+', value: '500+' }
+                            { label: '100 – 500 Units', value: '100-500' },
+                            { label: '500 – 1000 Units', value: '500-1000' },
+                            { label: '1000 – 5000 Units', value: '1000-5000' },
+                            { label: '5000+ Units', value: '5000+' }
                         ]
                     });
                     break;
                 case 'budget':
                     addMessage({
                         type: 'bot',
-                        text: 'Perfect 👍 We offer special pricing and customization for this volume. What is your approximate budget per gift?',
+                        text: 'To help us filter the best deals for you, what is your expected purchase budget?',
                         options: [
-                            { label: 'Under ₹500', value: '<500' },
-                            { label: '₹500 – ₹1000', value: '500-1000' },
-                            { label: '₹1000 – ₹2500', value: '1000-2500' },
-                            { label: '₹2500+', value: '2500+' }
+                            { label: '₹25,000 – ₹50,000', value: '25k-50k' },
+                            { label: '₹50,000 – ₹1,00,000', value: '50k-100k' },
+                            { label: '₹1,00,000+', value: '100k+' }
                         ]
                     });
                     break;
-                case 'customization':
+                case 'gst':
                     addMessage({
                         type: 'bot',
-                        text: 'Great — I’ll suggest options matching your requirements. Do you need specific quality certifications?',
+                        text: 'Do you have a registered GST Number?',
                         options: [
-                            { label: 'Standard certifications', value: 'standard' },
-                            { label: 'Ethically sourced only', value: 'ethical' },
-                            { label: 'No specific requirements', value: 'none' }
-                        ]
-                    });
-                    break;
-                case 'delivery':
-                    addMessage({
-                        type: 'bot',
-                        text: 'Noted 👍 We specialize in authentic Ayurvedic and healthcare supply. When do you need delivery?',
-                        options: [
-                            { label: 'Within 1 week', value: '1week' },
-                            { label: '2–3 weeks', value: '2-3weeks' },
-                            { label: 'More than 3 weeks', value: '3weeks+' },
-                            { label: 'Flexible', value: 'flexible' }
-                        ]
-                    });
-                    break;
-                case 'preferences':
-                    addMessage({
-                        type: 'bot',
-                        text: 'Thanks! This helps us suggest items that can be delivered on time. Would you like to include any of these?',
-                        options: [
-                            { label: 'Standard Packaging', value: 'standard' },
-                            { label: 'Secure Medical Packaging', value: 'medical' },
-                            { label: 'Bulk Order Discount', value: 'bulk' },
-                            { label: 'Express Delivery', value: 'express' },
-                            { label: 'Done selection 👉', value: 'done' }
+                            { label: 'Yes', value: 'yes' },
+                            { label: 'No', value: 'no' }
                         ]
                     });
                     break;
                 case 'lead-capture':
                     addMessage({
                         type: 'bot',
-                        text: 'Please share your details so our wellness consultant can send curated options:',
+                        text: 'Please share your contact details so our sales team can contact you within 24 hours:',
                         isForm: true
                     });
                     break;
                 case 'success':
                     addMessage({
                         type: 'bot',
-                        text: 'Thank you! Your details have been submitted. You can now enter the site to explore our curated collections. 🎁',
+                        text: '✅ Thank you for sharing your details. Our sales team will contact you within 24 hours.\n\nFor urgent enquiries, you may WhatsApp us directly using the link below.',
                         options: [
-                            { label: '👉 Submit & Enter Site', value: 'enter', action: () => { navigate('/home'); } },
-                            { label: '👉 Talk to expert now', value: 'expert-now', action: () => { handleWhatsAppRedirect(); } }
+                            { label: '👉 Enter Site', value: 'enter', action: () => { navigate('/home'); } },
+                            { label: '👉 WhatsApp Us', value: 'expert-now', action: () => { handleWhatsAppRedirect(); } }
                         ]
                     });
                     break;
@@ -211,11 +199,27 @@ export function ChatBot() {
 
         switch (currentStep) {
             case 'welcome':
-                if (option.value === 'continue') nextStep('purpose', 'continue');
+                setFormData(prev => ({ ...prev, inquiryType: option.value }));
+                nextStep('buyer_type');
                 break;
-            case 'purpose':
-                setFormData(prev => ({ ...prev, purpose: option.value }));
-                nextStep('quantity');
+            case 'buyer_type':
+                setFormData(prev => ({ ...prev, buyerType: option.value }));
+                nextStep('product_interest');
+                break;
+            case 'product_interest':
+                if (option.value === 'next') {
+                    nextStep('quantity');
+                } else if (option.value === 'all') {
+                    setFormData(prev => ({ ...prev, productInterest: ['All Products'] }));
+                    nextStep('quantity');
+                } else {
+                    setFormData(prev => ({
+                        ...prev,
+                        productInterest: prev.productInterest.includes(option.value)
+                            ? prev.productInterest.filter(p => p !== option.value)
+                            : [...prev.productInterest, option.value]
+                    }));
+                }
                 break;
             case 'quantity':
                 setFormData(prev => ({ ...prev, quantity: option.value }));
@@ -223,27 +227,11 @@ export function ChatBot() {
                 break;
             case 'budget':
                 setFormData(prev => ({ ...prev, budget: option.value }));
-                nextStep('customization');
+                nextStep('gst');
                 break;
-            case 'customization':
-                setFormData(prev => ({ ...prev, customization: option.value }));
-                nextStep('delivery');
-                break;
-            case 'delivery':
-                setFormData(prev => ({ ...prev, delivery: option.value }));
-                nextStep('preferences');
-                break;
-            case 'preferences':
-                if (option.value === 'done') {
-                    nextStep('lead-capture');
-                } else {
-                    setFormData(prev => ({
-                        ...prev,
-                        preferences: prev.preferences.includes(option.value)
-                            ? prev.preferences.filter(p => p !== option.value)
-                            : [...prev.preferences, option.value]
-                    }));
-                }
+            case 'gst':
+                setFormData(prev => ({ ...prev, gst: option.value }));
+                nextStep('lead-capture');
                 break;
         }
     };
@@ -271,14 +259,16 @@ export function ChatBot() {
             phone: formData.leadInfo.mobile,
             subject: 'Chatbot Lead - Ayurvedic & Healthcare',
             message: `
---- CHATBOT LEAD ---
-Purpose: ${formData.purpose}
-Quantity: ${formData.quantity}
+--- B2B CHATBOT LEAD ---
+Inquiry Type: ${formData.inquiryType}
+Buyer Type: ${formData.buyerType}
+Product Interest: ${formData.productInterest.join(', ')}
+Monthly Quantity: ${formData.quantity}
 Budget: ${formData.budget}
-Customization: ${formData.customization}
-Delivery: ${formData.delivery}
-Preferences: ${formData.preferences.join(', ')}
-Company: ${formData.leadInfo.company}
+Has GST: ${formData.gst}
+Location: ${formData.leadInfo.location}
+Business Name: ${formData.leadInfo.company}
+GST Number: ${formData.leadInfo.gstNumber}
             `.trim()
         };
 
@@ -401,6 +391,26 @@ Company: ${formData.leadInfo.company}
                                                                         onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, email: e.target.value } }))}
                                                                     />
                                                                 </div>
+                                                                <div className="space-y-1.5 md:col-span-2">
+                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">Delivery Location (City & State)</Label>
+                                                                    <Input
+                                                                        required
+                                                                        className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                                                                        value={formData.leadInfo.location}
+                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, location: e.target.value } }))}
+                                                                    />
+                                                                </div>
+                                                                {formData.gst === 'yes' && (
+                                                                    <div className="space-y-1.5 md:col-span-2">
+                                                                        <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">GST Number</Label>
+                                                                        <Input
+                                                                            required
+                                                                            className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                                                                            value={formData.leadInfo.gstNumber}
+                                                                            onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, gstNumber: e.target.value } }))}
+                                                                        />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-12 md:h-14 text-base md:text-lg font-medium rounded-xl transition-all">
                                                                 Submit & Enter Site <Send size={18} />
@@ -417,13 +427,13 @@ Company: ${formData.leadInfo.company}
                                                                         if (opt.action) opt.action();
                                                                         handleOptionClick(opt);
                                                                     }}
-                                                                    className={`text-xs md:text-sm px-4 md:px-5 py-2 md:py-2.5 rounded-full border transition-all ${formData.preferences.includes(opt.value)
+                                                                    className={`text-xs md:text-sm px-4 md:px-5 py-2 md:py-2.5 rounded-full border transition-all ${formData.productInterest.includes(opt.value) && currentStep === 'product_interest'
                                                                         ? 'bg-primary text-primary-foreground border-primary shadow-md active:scale-95'
                                                                         : 'bg-white border-border hover:border-primary hover:text-primary active:bg-primary/10 shadow-sm'
                                                                         }`}
                                                                 >
                                                                     {opt.label}
-                                                                    {formData.preferences.includes(opt.value) && <Check size={14} className="inline ml-1.5" />}
+                                                                    {formData.productInterest.includes(opt.value) && currentStep === 'product_interest' && <Check size={14} className="inline ml-1.5" />}
                                                                 </button>
                                                             ))}
                                                         </div>
@@ -484,7 +494,7 @@ Company: ${formData.leadInfo.company}
                         </motion.div>
                     </div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence >
 
             <div className="fixed bottom-6 right-6 z-50">
                 <motion.button

@@ -154,19 +154,45 @@ export function ProductPage() {
               </CardContent>
             </Card>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col gap-6 mb-8">
-              <div className="flex justify-start">
+            {/* Quantity Selector */}
+            <div className="mb-6 flex items-center space-x-4">
+              <label htmlFor="quantity" className="font-semibold text-muted-foreground">Quantity:</label>
+              <div className="flex items-center border rounded-md">
                 <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-bold h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg border-none transition-all active:scale-95"
-                  onClick={handleWhatsApp}
-                >
-                  <MessageCircle className="mr-2" size={20} />
-                  WhatsApp Us
-                </Button>
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  className="rounded-none rounded-l-md"
+                >-</Button>
+                <div className="w-12 text-center font-medium">{quantity}</div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setQuantity(q => q + 1)}
+                  className="rounded-none rounded-r-md"
+                >+</Button>
               </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg transition-all active:scale-95 text-lg"
+                onClick={() => addToQuote(product, quantity)}
+                disabled={!product.inStock}
+              >
+                Add to Cart
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-bold h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg border-none transition-all active:scale-95 text-lg"
+                onClick={handleWhatsApp}
+              >
+                <MessageCircle className="mr-2" size={20} />
+                WhatsApp Us
+              </Button>
             </div>
             <p className="text-xl font-bold text-primary mb-8">
               Bulk orders and healthcare partnerships available. Contact us today!

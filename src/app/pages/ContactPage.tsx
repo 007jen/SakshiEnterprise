@@ -122,8 +122,8 @@ export function ContactPage() {
                       <h3 className="mb-2">Visit Us</h3>
                       <p className="text-muted-foreground">
                         Sakshi Enterprise<br />
-                        Business Center, Andheri East, <br />
-                        Mumbai, Maharashtra 400069, India
+                        A/502, Platinum Building, Near Momaya park,<br />
+                        Village Road, Bhandup West, Mumbai - 400078
                       </p>
                     </div>
                   </div>
@@ -275,7 +275,7 @@ export function ContactPage() {
                     <MapPin className="mx-auto mb-4 text-muted-foreground" size={48} />
                     <p className="text-lg text-muted-foreground">Map View</p>
                     <p className="text-sm text-muted-foreground">
-                      Business Center, Andheri East, Mumbai
+                      A/502, Platinum Building, Near Momaya park, Bhandup West, Mumbai - 400078
                     </p>
                   </div>
                 </div>

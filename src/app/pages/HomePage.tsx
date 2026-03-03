@@ -7,6 +7,20 @@ import { motion, AnimatePresence } from 'motion/react';
 import { testimonials } from '../data/products';
 import Banner from '../../assets/Dark1.jpeg';
 import GoldenImage from '../../assets/goldenImage.jpg';
+import AboutImage from '../../assets/home.png';
+import ZanduLogo from '../../assets/ZanDu.png';
+import BaidyanathLogo from '../../assets/Baidyanath.png';
+import SanduLogo from '../../assets/Sandu.png';
+import HamdardLogo from '../../assets/Hamdard.png';
+import JinvarLogo from '../../assets/Jinvar.png';
+
+const localLogos: Record<string, string> = {
+  'Zandu': ZanduLogo,
+  'Baidyanath': BaidyanathLogo,
+  'Sandu': SanduLogo,
+  'Hamdard': HamdardLogo,
+  'Jinvar': JinvarLogo,
+};
 
 interface Product {
   id: string;
@@ -37,8 +51,8 @@ const slides = [
   {
     id: 1,
     image: Banner,
-    title: "Ayurvedic Wellness Solutions",
-    subtitle: "Promoting health through authentic traditions.",
+    title: "Ayurvedic Solutions",
+    subtitle: "Promoting health through traditions.",
     ctaText: "Request Bulk Quote",
     ctaLink: "/quote",
     description: ""
@@ -47,7 +61,7 @@ const slides = [
     id: 2,
     image: GoldenImage,
     title: "Essential Healthcare Products",
-    subtitle: "Reliable supply for your wellness needs.",
+    subtitle: "Reliable supply for your needs.",
     ctaText: "Explore Products",
     ctaLink: "/products",
     description: ""
@@ -57,25 +71,38 @@ const slides = [
 export function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/products`);
-        if (res.ok) {
-          const data = await res.json();
-          setFeaturedProducts(data.slice(0, 4));
+        const [prodRes, catRes] = await Promise.all([
+          fetch(`${apiBaseUrl}/api/products`),
+          fetch(`${apiBaseUrl}/api/categories`)
+        ]);
+
+        if (prodRes.ok) {
+          const prodData = await prodRes.json();
+          setFeaturedProducts(prodData.slice(0, 4));
+        }
+
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          // Filter only the new Ayurvedic brands for the homepage display
+          const brandNames = ['Zandu', 'Baidyanath', 'Sandu', 'Hamdard', 'Jinvar', 'Rivayu'];
+          const mappedBrands = catData.filter((c: any) => brandNames.includes(c.name));
+          setCategories(mappedBrands);
         }
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
-  }, []);
+    fetchData();
+  }, [apiBaseUrl]);
 
   // Commented out auto-sliding animation as per user request
   // useEffect(() => {
@@ -143,9 +170,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
-
       {/* About Section */}
-      <section className="py-20 bg-muted">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -156,7 +182,7 @@ export function HomePage() {
             >
               <h2 className="text-4xl mb-6">About Sakshi Enterprise</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                We are a trusted supplier of Ayurvedic and healthcare  products committed to promoting quality, reliability, and customer satisfaction. We specialize in authentic Ayurvedic preparations and essential healthcare products.
+                We are a trusted supplier of Ayurvedic and healthcare products committed to promoting quality, reliability, and customer satisfaction. We specialize in authentic Ayurvedic preparations and essential healthcare products.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
@@ -180,12 +206,62 @@ export function HomePage() {
               viewport={{ once: true }}
             >
               <img
-                src="https://placehold.co/600x400/1b4332/white?text=Sakshi+Enterprise"
+                src={AboutImage}
                 alt="About Us"
-                className="rounded-lg shadow-xl"
+                className="rounded-lg shadow-xl w-full h-auto"
               />
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Ayurvedic Brands Section */}
+      <section className="py-20 bg-muted">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl mb-4 text-primary font-bold">Best brands we supply from</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              We proudly supply  products from most trusted Ayurvedic brands, ensuring quality and reliability for your business.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {categories.map((category, index) => {
+              const logoSrc = localLogos[category.name] || (category.logo?.startsWith('http') ? category.logo : null);
+
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="flex flex-col items-center group cursor-pointer"
+                >
+                  <Link to={`/products?category=${category.name.toLowerCase()}`} className="w-full flex flex-col items-center">
+                    <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full shadow-md flex items-center justify-center mb-4 overflow-hidden border-2 border-transparent group-hover:border-primary transition-all duration-300 group-hover:shadow-xl">
+                      {logoSrc ? (
+                        <img
+                          src={logoSrc}
+                          alt={category.name}
+                          className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <span className="text-4xl font-bold border-2 border-primary text-primary rounded-full w-20 h-20 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500">
+                          {category.name.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-semibold text-center group-hover:text-primary transition-colors">{category.name}</h3>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {categories.length === 0 && !loading && (
+            <div className="text-center text-muted-foreground py-12">Loading brands...</div>
+          )}
         </div>
       </section>
 
@@ -195,7 +271,7 @@ export function HomePage() {
           <div className="text-center mb-10 md:mb-12">
             <h2 className="text-3xl md:text-4xl mb-3 md:mb-4">Why Choose Sakshi Enterprise</h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Your trusted partner for authentic wellness and healthcare distribution
+              Your trusted partner for Ayurvedic and general medicine
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -344,7 +420,7 @@ export function HomePage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl md:text-3xl mb-4">Looking for a Reliable Healthcare Partner?</h2>
           <p className="text-base md:text-lg text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Let us help you support healthier communities with our premium wellness solutions
+            Let us help you support healthier communities with our solutions
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link to="/quote" className="w-full sm:w-auto">

@@ -8,7 +8,7 @@ const getResend = () => {
     return new Resend(apiKey);
 };
 
-export const sendNotificationEmail = async (subject: string, html: string) => {
+export const sendNotificationEmail = async (subject: string, html: string, toEmail?: string) => {
     console.log(`[Mailer] Attempting to send email via Resend: "${subject}"...`);
 
     const resend = getResend();
@@ -20,9 +20,15 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
     try {
         const adminEmails = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || 'jajoshi2005@gmail.com';
 
+        const recipients = ['joshijenil12@gmail.com']; // Admin
+        if (toEmail) {
+            recipients.push(toEmail); // Customer
+        }
+
         const { data, error } = await resend.emails.send({
             from: 'Sakshi Enterprise <onboarding@resend.dev>',
-            to: ['joshijenil12@gmail.com'], // Force recipient to owner address for local testing
+            to: recipients,
+
             subject: subject,
             html: html,
         });

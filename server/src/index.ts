@@ -290,7 +290,29 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
                     <a href="mailto:${email}?subject=Quote Request Follow-up - Sakshi Enterprise" style="background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-left: 10px;">Reply via Email</a>
                 </div>
             </div>`
-        ).catch(err => console.error("[Quote] Email error:", err));
+        ).catch(err => console.error("[Quote] Admin Email error:", err));
+
+        // Send order confirmation email to the customer
+        sendNotificationEmail(
+            `Order Received - Sakshi Enterprise`,
+            `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #2D6A4F; border-bottom: 2px solid #2D6A4F; padding-bottom: 10px;">Order Confirmation</h2>
+                <p>Hello <strong>${sanitizedFullName}</strong>,</p>
+                <p>Thank you for placing your order with Sakshi Enterprise. We have received your order and it is currently awaiting payment confirmation.</p>
+                <h3 style="color: #2D6A4F; margin-top: 20px;">Your Order Details:</h3>
+                <ul style="background: #f9f9f9; padding: 15px 15px 15px 35px; border-radius: 5px;">
+                    ${itemListHtml}
+                </ul>
+                <p><strong>Total Items:</strong> ${items.length}</p>
+                <div style="margin-top: 30px; padding: 20px; text-align: center; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 5px;">
+                    <h4 style="margin: 0 0 10px 0; color: #166534;">Payment Pending</h4>
+                    <p style="margin: 0; font-size: 14px;">If you haven't completed your bank transfer or UPI payment yet, please do so using the details on the payment page.</p>
+                </div>
+                <p style="margin-top: 30px; font-size: 14px; color: #666;">If you have any questions, simply reply to this email or contact us on WhatsApp at <a href="https://wa.me/919326347507">+91 9326347507</a>.</p>
+                <p style="margin-top: 20px;">Best regards,<br>The Sakshi Enterprise Team</p>
+            </div>`,
+            email
+        ).catch(err => console.error("[Quote] Customer Email error:", err));
 
         res.status(201).json({ message: 'Quote request submitted successfully', id: quoteRequest.id });
     } catch (error) {

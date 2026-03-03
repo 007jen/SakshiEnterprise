@@ -233,20 +233,38 @@ export function Header() {
               )}
             </div>
 
-            <Link to="/quote" className="text-white hover:text-white/80 transition-colors relative">
-              <ShoppingBag size={22} />
-              {quoteCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                  {quoteCount}
-                </span>
-              )}
-            </Link>
-
-            <Link to="/quote">
-              <Button className="bg-white hover:bg-white/90 text-[#1b4332]">
-                Get a Quote
-              </Button>
-            </Link>
+            <SignedIn>
+              <Link to="/quote" className="text-white hover:text-white/80 transition-colors relative">
+                <ShoppingBag size={22} />
+                {quoteCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                    {quoteCount}
+                  </span>
+                )}
+              </Link>
+              <Link to="/quote">
+                <Button className="bg-white hover:bg-white/90 text-[#1b4332] font-semibold">
+                  Cart
+                </Button>
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/quote">
+                <button className="text-white hover:text-white/80 transition-colors relative">
+                  <ShoppingBag size={22} />
+                  {quoteCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                      {quoteCount}
+                    </span>
+                  )}
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal" forceRedirectUrl="/quote">
+                <Button className="bg-white hover:bg-white/90 text-[#1b4332] font-semibold cursor-pointer">
+                  Cart
+                </Button>
+              </SignInButton>
+            </SignedOut>
 
             <SignedOut>
               <SignInButton mode="modal">
@@ -266,14 +284,28 @@ export function Header() {
 
           {/* Mobile Actions & Menu (Visible on small screens) */}
           <div className="flex lg:hidden items-center space-x-4">
-            <Link to="/quote" className="text-white hover:text-white/80 transition-colors relative">
-              <ShoppingBag size={24} />
-              {quoteCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4.5 h-4.5 flex items-center justify-center rounded-full font-bold">
-                  {quoteCount}
-                </span>
-              )}
-            </Link>
+            <SignedIn>
+              <Link to="/quote" className="text-white hover:text-white/80 transition-colors relative">
+                <ShoppingBag size={24} />
+                {quoteCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4.5 h-4.5 flex items-center justify-center rounded-full font-bold">
+                    {quoteCount}
+                  </span>
+                )}
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/quote">
+                <button className="text-white hover:text-white/80 transition-colors relative">
+                  <ShoppingBag size={24} />
+                  {quoteCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4.5 h-4.5 flex items-center justify-center rounded-full font-bold">
+                      {quoteCount}
+                    </span>
+                  )}
+                </button>
+              </SignInButton>
+            </SignedOut>
             <SignedIn>
               <UserButton appearance={{
                 elements: {
@@ -396,13 +428,13 @@ export function Header() {
               <div className="pt-4 border-t border-muted">
                 <Link to="/quote" className="flex items-center space-x-2 text-primary py-2" onClick={() => setIsMobileMenuOpen(false)}>
                   <ShoppingBag size={20} />
-                  <span>Quote Cart ({quoteCount})</span>
+                  <span>Cart ({quoteCount})</span>
                 </Link>
               </div>
 
               <Link to="/quote" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Get a Quote
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                  Cart
                 </Button>
               </Link>
             </nav>

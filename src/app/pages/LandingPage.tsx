@@ -183,10 +183,10 @@ export function LandingPage() {
                         >
                             <h2 className="text-primary tracking-widest uppercase text-sm mb-4 font-semibold">About Us</h2>
                             <h3 className="text-4xl md:text-6xl font-light mb-8 leading-tight text-primary">
-                                Promoting Quality & <span className="text-primary italic font-bold capitalize text-5xl md:text-7xl">Wellness</span>
+                                Promoting Quality  <span className="text-primary italic font-bold capitalize text-5xl md:text-7xl">Products</span>
                             </h3>
                             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                                Sakshi Enterprise is a trusted supplier of Ayurvedic and healthcare wellness products. We specialize in authentic Ayurvedic preparations and selected healthcare essentials for pharmacies, retailers, and distributors.
+                                Sakshi Enterprise is a trusted supplier of Ayurvedic and general medicines products. We specialize in Ayurvedic preparations and selected healthcare essentials for pharmacies, retailers, and distributors.
                             </p>
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-2">

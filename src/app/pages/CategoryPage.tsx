@@ -4,9 +4,23 @@ import { Seo } from '../components/SEO';
 import { motion } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 
-import { Category, Product } from '../types';
+import { Category } from '../types';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/button';
+
+import ZanduLogo from '../../assets/ZanDu.png';
+import BaidyanathLogo from '../../assets/Baidyanath.png';
+import SanduLogo from '../../assets/Sandu.png';
+import HamdardLogo from '../../assets/Hamdard.png';
+import JinvarLogo from '../../assets/Jinvar.png';
+
+const localLogos: Record<string, string> = {
+  'Zandu': ZanduLogo,
+  'Baidyanath': BaidyanathLogo,
+  'Sandu': SanduLogo,
+  'Hamdard': HamdardLogo,
+  'Jinvar': JinvarLogo,
+};
 
 export function CategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -61,10 +75,26 @@ export function CategoryPage() {
       />
       {/* Category Hero */}
       <section className="bg-gradient-to-br from-primary to-secondary text-primary-foreground pt-24 sm:pt-32 pb-8 sm:pb-12">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 flex items-center gap-6">
+          {(() => {
+            const logoSrc = localLogos[category.name] || (category.logo?.startsWith('http') ? category.logo : null);
+            if (logoSrc) {
+              return (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center p-3 shadow-lg shrink-0"
+                >
+                  <img src={logoSrc} alt={category.name} className="w-full h-full object-contain" />
+                </motion.div>
+              );
+            }
+            return null;
+          })()}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             className="max-w-3xl"
           >

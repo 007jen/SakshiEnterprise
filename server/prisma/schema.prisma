@@ -26,6 +26,7 @@ model Category {
     name        String    @unique
     description String?
     icon        String?
+    logo        String? // URL or path to the brand logo
     products    Product[]
 }
 

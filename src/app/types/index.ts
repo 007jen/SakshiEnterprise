@@ -12,5 +12,6 @@ export interface Product {
 export interface Category {
     id: string;
     name: string;
+    logo?: string;
     products?: Product[];
 }

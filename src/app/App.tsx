@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ChatBot } from './components/ChatBot';
@@ -9,6 +9,7 @@ import { AboutPage } from './pages/AboutPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { ProductPage } from './pages/ProductPage';
 import { QuotePage } from './pages/QuotePage';
+import { PaymentPage } from './pages/PaymentPage';
 import { ContactPage } from './pages/ContactPage';
 import { QuoteProvider } from './context/QuoteContext';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -28,7 +29,6 @@ const GatewayGuard = () => {
 
 const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoaded } = useUser();
-  const navigate = useNavigate();
 
   const adminEmailStr = import.meta.env.VITE_ADMIN_EMAIL || '';
   const adminEmails = adminEmailStr
@@ -76,6 +76,7 @@ export default function App() {
                     <Route path="/categories/:categoryId" element={<CategoryPage />} />
                     <Route path="/products/:productId" element={<ProductPage />} />
                     <Route path="/quote" element={<QuotePage />} />
+                    <Route path="/payment" element={<PaymentPage />} />
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
                     <Route path="*" element={<NotFoundPage />} />
