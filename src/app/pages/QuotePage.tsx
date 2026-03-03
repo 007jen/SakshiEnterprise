@@ -23,8 +23,12 @@ export function QuotePage() {
     companyName: '',
     email: user?.primaryEmailAddress?.emailAddress || '',
     phone: '',
+    billingAddress: '',
+    shippingAddress: '',
     additionalNotes: ''
   }));
+
+  const [sameAsBilling, setSameAsBilling] = useState(false);
 
   // Sync with user data when it loads
   useEffect(() => {
@@ -51,6 +55,8 @@ export function QuotePage() {
         companyName: formData.companyName,
         email: formData.email,
         phone: formData.phone,
+        billingAddress: formData.billingAddress,
+        shippingAddress: sameAsBilling ? formData.billingAddress : formData.shippingAddress,
         additionalNotes: formData.additionalNotes,
         items: items.map(item => ({
           id: item.id,
@@ -71,8 +77,9 @@ export function QuotePage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         clearQuote();
-        navigate('/payment', { state: { total: orderTotal } });
+        navigate('/payment', { state: { total: orderTotal, quoteId: data.id } });
       } else {
         const err = await response.json();
         if (response.status === 429) {
@@ -199,7 +206,17 @@ export function QuotePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {renderFormColumn(isLoaded, isSignedIn, user, formData, isSubmitting, handleSubmit, handleChange)}
+            {renderFormColumn({
+              isLoaded,
+              isSignedIn,
+              user,
+              formData,
+              isSubmitting,
+              handleSubmit,
+              handleChange,
+              sameAsBilling,
+              setSameAsBilling
+            })}
           </motion.div>
         </div>
       </div>
@@ -207,7 +224,29 @@ export function QuotePage() {
   );
 }
 
-function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, formData: any, isSubmitting: boolean, handleSubmit: any, handleChange: any) {
+interface FormColumnProps {
+  isLoaded: boolean;
+  isSignedIn: boolean;
+  user: any;
+  formData: any;
+  isSubmitting: boolean;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  handleChange: (field: string, value: string) => void;
+  sameAsBilling: boolean;
+  setSameAsBilling: (val: boolean) => void;
+}
+
+function renderFormColumn({
+  isLoaded,
+  isSignedIn,
+  user,
+  formData,
+  isSubmitting,
+  handleSubmit,
+  handleChange,
+  sameAsBilling,
+  setSameAsBilling
+}: FormColumnProps) {
   if (!isLoaded) {
     return (
       <Card className="p-8 text-center bg-primary/5 border-primary/20">
@@ -305,7 +344,50 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Address Information</h3>
+
+            <div className="space-y-2">
+              <Label htmlFor="billingAddress">Bill To (Billing Address) *</Label>
+              <Textarea
+                id="billingAddress"
+                placeholder="Full billing address with Pincode"
+                required
+                value={formData.billingAddress}
+                onChange={(e) => handleChange('billingAddress', e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 py-1">
+              <input
+                type="checkbox"
+                id="sameAsBilling"
+                checked={sameAsBilling}
+                onChange={(e) => setSameAsBilling(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+              />
+              <Label htmlFor="sameAsBilling" className="text-sm cursor-pointer select-none">
+                Ship to the same address
+              </Label>
+            </div>
+
+            {!sameAsBilling && (
+              <div className="space-y-2 transition-all">
+                <Label htmlFor="shippingAddress">Ship To (Delivery Address) *</Label>
+                <Textarea
+                  id="shippingAddress"
+                  placeholder="Full delivery address with Pincode"
+                  required={!sameAsBilling}
+                  value={formData.shippingAddress}
+                  onChange={(e) => handleChange('shippingAddress', e.target.value)}
+                  rows={3}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2 pt-2">
             <Label htmlFor="notes">Additional Requirements</Label>
             <Textarea
               id="notes"

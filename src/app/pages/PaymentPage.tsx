@@ -12,12 +12,17 @@ export function PaymentPage() {
     const location = useLocation();
     const navigate = useNavigate();
     const [orderTotal, setOrderTotal] = useState<number>(0);
+    const [quoteId, setQuoteId] = useState<string | null>(null);
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+    const [orderCancelled, setOrderCancelled] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
-        // Read the total passed from QuotePage via router state
+        // Read state passed from QuotePage
         if (location.state && typeof location.state.total === 'number') {
             setOrderTotal(location.state.total);
+            setQuoteId(location.state.quoteId || null);
         } else {
             // Redirect back to home if accessed directly without state
             navigate('/home', { replace: true });
@@ -28,6 +33,65 @@ export function PaymentPage() {
         setPaymentConfirmed(true);
         toast.success("Payment Confirmation Recorded. Thank you!");
     };
+
+    const handleCancelOrder = async () => {
+        if (!quoteId) return;
+
+        if (!confirm("Are you sure you want to cancel this order request? This action cannot be undone.")) {
+            return;
+        }
+
+        setIsCancelling(true);
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/quotes/${quoteId}/cancel`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                setOrderCancelled(true);
+                toast.error("Order request successfully cancelled.");
+            } else {
+                const err = await response.json();
+                toast.error(`Error: ${err.error || 'Failed to cancel order'}`);
+            }
+        } catch (error) {
+            console.error('Cancellation error:', error);
+            toast.error("Could not connect to the server.");
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
+    if (orderCancelled) {
+        return (
+            <div className="min-h-screen pt-32 pb-20 bg-red-50/30">
+                <Seo title="Order Cancelled | Sakshi Enterprise" description="Your order request has been cancelled." />
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="max-w-2xl mx-auto"
+                    >
+                        <Card className="text-center shadow-lg border-red-200">
+                            <CardContent className="pt-12 pb-12">
+                                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <CheckCircle className="text-red-600" size={48} />
+                                </div>
+                                <h1 className="text-4xl mb-4 font-bold text-red-900">Order Cancelled</h1>
+                                <p className="text-lg text-muted-foreground mb-8">
+                                    Your request has been successfully removed from our system. A cancellation confirmation has been sent to your email.
+                                </p>
+                                <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white" onClick={() => navigate('/home')}>
+                                    Return to Home
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                </div>
+            </div>
+        );
+    }
 
     if (paymentConfirmed) {
         return (
@@ -88,6 +152,16 @@ export function PaymentPage() {
                                     <CardDescription className="mt-2 text-sm">
                                         Please transfer exactly this amount using one of the methods below.
                                     </CardDescription>
+                                    <div className="mt-6 pt-6 border-t">
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 font-semibold"
+                                            disabled={isCancelling}
+                                            onClick={handleCancelOrder}
+                                        >
+                                            {isCancelling ? 'Cancelling...' : 'Cancel Order Request'}
+                                        </Button>
+                                    </div>
                                 </CardHeader>
                             </Card>
 

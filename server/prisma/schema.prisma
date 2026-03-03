@@ -51,12 +51,17 @@ model QuoteRequest {
     companyName     String
     email           String
     phone           String
+    billingAddress  String?
+    shippingAddress String?
+    status          String      @default("PENDING") // PENDING, CANCELLED, COMPLETED
+    clerkUserId     String?
     additionalNotes String?
     items           QuoteItem[]
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
 
     @@index([createdAt])
+    @@index([clerkUserId])
 }
 
 model QuoteItem {

@@ -127,6 +127,11 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(401).json({ error: 'Invalid session' });
         }
 
+        (req as any).auth = {
+            userId: sessionClaims.sub,
+            claims: sessionClaims
+        };
+
         // Fetch user to get current email address
         const user = await clerkClient.users.getUser(sessionClaims.sub as string);
         const userEmail = user.primaryEmailAddress?.emailAddress;
@@ -146,6 +151,29 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
         console.error('Auth check failed:', error);
         res.status(401).json({ error: 'Unauthorized' });
     }
+};
+
+// Optional Auth middleware (doesn't block but populates req.auth)
+const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+        try {
+            const token = authHeader.split(' ')[1];
+            const sessionClaims = await verifyToken(token, {
+                secretKey: process.env.CLERK_SECRET_KEY,
+            });
+            if (sessionClaims) {
+                (req as any).auth = {
+                    userId: sessionClaims.sub,
+                    claims: sessionClaims
+                };
+            }
+        } catch (err) {
+            // Token verification failed - invalid or expired
+            console.debug('Optional auth token verification failed.');
+        }
+    }
+    next();
 };
 
 // --- PUBLIC ROUTES ---
@@ -216,9 +244,10 @@ app.post('/api/leads', submissionLimiter, async (req, res) => {
 });
 
 // Submit Quote Request (requireAuth commented out for public access per client request)
-app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) => {
+app.post('/api/quotes', optionalAuth, submissionLimiter, async (req, res) => {
     try {
-        const { fullName, companyName, email, phone, additionalNotes, items } = req.body;
+        const { fullName, companyName, email, phone, billingAddress, shippingAddress, additionalNotes, items } = req.body;
+        const clerkUserId = (req as any).auth?.userId;
 
         if (!fullName || !companyName || !email || !phone || !items || !Array.isArray(items)) {
             return res.status(400).json({ error: 'Missing required fields or invalid items' });
@@ -246,6 +275,9 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
                 companyName: sanitizedCompanyName,
                 email,
                 phone,
+                billingAddress,
+                shippingAddress,
+                clerkUserId,
                 additionalNotes: sanitizedNotes,
                 items: {
                     create: items.map((item: any) => {
@@ -282,6 +314,8 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
                 <p><strong>Company:</strong> ${sanitizedCompanyName}</p>
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Phone:</strong> ${phone}</p>
+                <p><strong>Billing Address:</strong> ${billingAddress || 'N/A'}</p>
+                <p><strong>Shipping Address:</strong> ${shippingAddress || 'N/A'}</p>
                 <h3 style="color: #2D6A4F;">Items Requested:</h3>
                 <ul>
                     ${itemListHtml}
@@ -305,7 +339,13 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
                 <p>Hello <strong>${sanitizedFullName}</strong>,</p>
                 <p>Thank you for placing your order with Sakshi Enterprise. We have received your order and it is currently awaiting payment confirmation.</p>
                 <h3 style="color: #2D6A4F; margin-top: 20px;">Your Order Details:</h3>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <p><strong>Billing Address:</strong> ${billingAddress || 'N/A'}</p>
+                    <p><strong>Shipping Address:</strong> ${shippingAddress || 'N/A'}</p>
+                </div>
                 <ul style="background: #f9f9f9; padding: 15px 15px 15px 35px; border-radius: 5px;">
+                    ${itemListHtml}
+                </ul>
                     ${itemListHtml}
                 </ul>
                 <p><strong>Total Items:</strong> ${items.length}</p>
@@ -323,6 +363,81 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
     } catch (error) {
         console.error('Error submitting quote:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Cancel Quote Request
+app.patch('/api/quotes/:id/cancel', optionalAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const clerkUserId = (req as any).auth?.userId;
+
+        // 1. Fetch the quote with items
+        const quote = await prisma.quoteRequest.findUnique({
+            where: { id: id as string },
+            include: { items: true }
+        }) as any;
+
+        if (!quote) {
+            return res.status(404).json({ error: 'Request not found' });
+        }
+
+        if (quote.status === 'CANCELLED') {
+            return res.status(400).json({ error: 'Order is already cancelled' });
+        }
+
+        // 2. Update status in DB
+        await prisma.quoteRequest.update({
+            where: { id: id as string },
+            data: { status: 'CANCELLED' }
+        });
+
+        console.log(`[Quote] Order ${id} cancelled successfully.`);
+
+        // 3. Attempt to send notifications (Background tasks to avoid blocking response)
+        const runNotifications = async () => {
+            try {
+                // Admin Notification
+                await sendNotificationEmail(
+                    `ORDER CANCELLED: ${quote.fullName}`,
+                    `<div style="font-family: Arial, sans-serif; color: #333;">
+                        <h2 style="color: #d03d3d;">Order Cancellation Notice</h2>
+                        <p>Order <strong>${id}</strong> has been cancelled by the customer.</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <h3 style="color: #444;">Customer Details:</h3>
+                        <p style="margin: 5px 0;"><strong>Name:</strong> ${quote.fullName}</p>
+                        <p style="margin: 5px 0;"><strong>Email:</strong> ${quote.email}</p>
+                        <p style="margin: 5px 0;"><strong>Phone:</strong> ${quote.phone}</p>
+                        <p style="margin: 5px 0;"><strong>Billing Address:</strong> ${quote.billingAddress || 'N/A'}</p>
+                        <p style="margin: 5px 0;"><strong>Shipping Address:</strong> ${quote.shippingAddress || 'N/A'}</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <h3 style="color: #444;">Cancelled Items:</h3>
+                        <ul>
+                            ${(quote.items || []).map((i: any) => `<li>${i.productName} x ${i.quantity}</li>`).join('')}
+                        </ul>
+                        <p style="color: #666; font-size: 12px; margin-top: 30px;">Sent from Sakshient.com</p>
+                    </div>`
+                );
+
+                // Customer Notification
+                if (quote.email) {
+                    await sendNotificationEmail(
+                        `Order Cancellation - Sakshi Enterprise`,
+                        `<p>Hello ${quote.fullName}, your order request ${id} has been cancelled.</p>`,
+                        quote.email
+                    );
+                }
+            } catch (err) {
+                console.error("[Cancel] Notification background task failed:", err);
+            }
+        };
+
+        runNotifications(); // Fire and forget
+
+        return res.json({ message: 'Order cancelled successfully', status: 'CANCELLED' });
+    } catch (error: any) {
+        console.error('Error during cancellation:', error);
+        res.status(500).json({ error: 'Internal server error during cancellation', details: error.message });
     }
 });
 

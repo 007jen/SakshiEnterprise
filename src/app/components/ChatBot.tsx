@@ -37,7 +37,8 @@ export function ChatBot() {
             company: '', // Maps to Business Name
             mobile: '',
             email: '',
-            location: '',
+            billingAddress: '',
+            shippingAddress: '',
             gstNumber: ''
         }
     });
@@ -236,7 +237,8 @@ Product Interest: ${formData.productInterest.join(', ')}
 Monthly Quantity: ${formData.quantity}
 Budget: ${formData.budget}
 Has GST: ${formData.gst}
-Location: ${formData.leadInfo.location}
+Billing Address: ${formData.leadInfo.billingAddress}
+Shipping Address: ${formData.leadInfo.shippingAddress}
 Business Name: ${formData.leadInfo.company}
 GST Number: ${formData.leadInfo.gstNumber}
             `.trim()
@@ -354,12 +356,23 @@ GST Number: ${formData.leadInfo.gstNumber}
                                                                     />
                                                                 </div>
                                                                 <div className="space-y-1.5 md:col-span-2">
-                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">Delivery Location (City & State)</Label>
+                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">Bill To (Billing Address)</Label>
                                                                     <Input
                                                                         required
                                                                         className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
-                                                                        value={formData.leadInfo.location}
-                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, location: e.target.value } }))}
+                                                                        value={formData.leadInfo.billingAddress}
+                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, billingAddress: e.target.value } }))}
+                                                                        placeholder="Full billing address"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1.5 md:col-span-2">
+                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">Ship To (Shipping Address)</Label>
+                                                                    <Input
+                                                                        required
+                                                                        className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                                                                        value={formData.leadInfo.shippingAddress}
+                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, shippingAddress: e.target.value } }))}
+                                                                        placeholder="Enter address or 'Same as Billing'"
                                                                     />
                                                                 </div>
                                                                 <div className="space-y-1.5 md:col-span-2">
