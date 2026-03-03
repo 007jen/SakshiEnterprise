@@ -26,7 +26,7 @@ export const sendNotificationEmail = async (subject: string, html: string, toEma
         }
 
         const { data, error } = await resend.emails.send({
-            from: 'Sakshi Enterprise <onboarding@resend.dev>',
+            from: 'Sakshi Enterprise <notifications@sakshient.com>',
             to: recipients,
 
             subject: subject,

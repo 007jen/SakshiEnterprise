@@ -89,7 +89,7 @@ export function ContactPage() {
                     </div>
                     <div>
                       <h3 className="mb-2">Email Us</h3>
-                      <p className="text-muted-foreground">{(import.meta.env.VITE_ADMIN_EMAIL || 'info@sakshienterprise.com').split(',')[0].trim()}</p>
+                      <p className="text-muted-foreground">sales.it@sakshient.com</p>
                     </div>
                   </div>
                 </CardContent>

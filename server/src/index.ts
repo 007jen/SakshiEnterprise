@@ -58,8 +58,8 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://clerk.sakshienterprise.com"],
-            connectSrc: ["'self'", "https://*.clerk.accounts.dev", "https://clerk.sakshienterprise.com", "https://api.cloudinary.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://clerk.sakshient.com"],
+            connectSrc: ["'self'", "https://*.clerk.accounts.dev", "https://clerk.sakshient.com", "https://api.cloudinary.com"],
             imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://*.clerk.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -77,7 +77,9 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
     sanitizedFrontendUrl,
-    'https://sakshi-enterprise.vercel.app' // Explicitly add specific vercel URL as fallback
+    'https://sakshi-enterprise.vercel.app', // Explicitly add specific vercel URL as fallback
+    'https://sakshient.com',
+    'https://www.sakshient.com'
 ];
 
 app.use(cors({
@@ -199,6 +201,9 @@ app.post('/api/leads', submissionLimiter, async (req, res) => {
                 <div style="margin-top: 20px;">
                     <a href="${whatsappLink}" style="background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reply via WhatsApp</a>
                     <a href="mailto:${email}" style="background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-left: 10px;">Reply via Email</a>
+                </div>
+                <div style="margin-top: 20px; border-top: 1px solid #eee; pt: 10px; font-size: 12px; color: #666;">
+                    Sent from Sakshient.com
                 </div>
             </div>`
         ).catch(err => console.error("[Lead] Email error:", err));
