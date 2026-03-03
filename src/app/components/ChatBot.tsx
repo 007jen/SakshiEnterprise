@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Check, Package, User, Building2, Phone, Mail } from 'lucide-react';
+import { MessageCircle, X, Send, Check, Package, User, Phone, Mail } from 'lucide-react';
 
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { toast } from 'sonner';
 import { getWhatsAppLink } from '../utils/helpers';
 
-type Step = 'welcome' | 'buyer_type' | 'product_interest' | 'quantity' | 'budget' | 'gst' | 'lead-capture' | 'success';
+type Step = 'welcome' | 'business_name' | 'buyer_type' | 'product_interest' | 'quantity' | 'lead-capture' | 'success';
 
 interface ChatMessage {
     id: string;
@@ -86,14 +85,10 @@ export function ChatBot() {
                 setIsTyping(false);
                 addMessage({
                     type: 'bot',
-                    text: "🌿 Welcome to Sakshi Enterprise\nEstablished in 2009, we are a trusted name in Ayurvedic and selected healthcare products. We are committed to delivering natural wellness solutions and quality healthcare essentials to customers across India through our online platform.\n\nWe believe in combining the wisdom of Ayurveda with modern distribution efficiency to ensure safe, reliable, and effective products reach every home.",
-                    options: [
-                        { label: '👉 Explore Products', value: 'continue' },
-                        // { label: '👉 Enter Site Directly', value: 'enter', action: () => { navigate('/home'); } },
-                        { label: '👉 Talk to an Expert', value: 'expert', action: () => handleWhatsAppRedirect() }
-                    ]
+                    text: "🌿 Welcome to Sakshi Enterprise!\nThank you for your interest in bulk purchase."
                 });
-            }, 1500);
+                nextStep('business_name');
+            }, 1000);
         }
     };
 
@@ -104,6 +99,12 @@ export function ChatBot() {
         setTimeout(() => {
             setIsTyping(false);
             switch (step) {
+                case 'business_name':
+                    addMessage({
+                        type: 'bot',
+                        text: 'What is your business name?'
+                    });
+                    break;
                 case 'buyer_type':
                     addMessage({
                         type: 'bot',
@@ -145,27 +146,6 @@ export function ChatBot() {
                         ]
                     });
                     break;
-                case 'budget':
-                    addMessage({
-                        type: 'bot',
-                        text: 'To help us filter the best deals for you, what is your expected purchase budget?',
-                        options: [
-                            { label: '₹25,000 – ₹50,000', value: '25k-50k' },
-                            { label: '₹50,000 – ₹1,00,000', value: '50k-100k' },
-                            { label: '₹1,00,000+', value: '100k+' }
-                        ]
-                    });
-                    break;
-                case 'gst':
-                    addMessage({
-                        type: 'bot',
-                        text: 'Do you have a registered GST Number?',
-                        options: [
-                            { label: 'Yes', value: 'yes' },
-                            { label: 'No', value: 'no' }
-                        ]
-                    });
-                    break;
                 case 'lead-capture':
                     addMessage({
                         type: 'bot',
@@ -178,7 +158,7 @@ export function ChatBot() {
                         type: 'bot',
                         text: '✅ Thank you for sharing your details. Our sales team will contact you within 24 hours.\n\nFor urgent enquiries, you may WhatsApp us directly using the link below.',
                         options: [
-                            { label: '👉 Enter Site', value: 'enter', action: () => { navigate('/home'); } },
+                            { label: '👉 Enter Site', value: 'enter', action: () => { navigate('/home'); setIsOpen(false); } },
                             { label: '👉 WhatsApp Us', value: 'expert-now', action: () => { handleWhatsAppRedirect(); } }
                         ]
                     });
@@ -223,14 +203,6 @@ export function ChatBot() {
                 break;
             case 'quantity':
                 setFormData(prev => ({ ...prev, quantity: option.value }));
-                nextStep('budget');
-                break;
-            case 'budget':
-                setFormData(prev => ({ ...prev, budget: option.value }));
-                nextStep('gst');
-                break;
-            case 'gst':
-                setFormData(prev => ({ ...prev, gst: option.value }));
                 nextStep('lead-capture');
                 break;
         }
@@ -244,12 +216,10 @@ export function ChatBot() {
             return;
         }
 
-        // IMMEDIATE ACTIONS: Unlock, Navigate, and Close
+        // IMMEDIATE ACTIONS: Unlock and progress to Success Message
         const now = Date.now();
         localStorage.setItem('sakshi_gateway_unlock', now.toString());
-        setIsOpen(false);
-        navigate('/home');
-        toast.success("Welcome! Access granted.");
+        nextStep('success');
 
         // BACKGROUND ACTION: API submission
         const payload = {
@@ -357,15 +327,7 @@ GST Number: ${formData.leadInfo.gstNumber}
                                                                         onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, name: e.target.value } }))}
                                                                     />
                                                                 </div>
-                                                                <div className="space-y-1.5">
-                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5"><Building2 size={12} /> Company</Label>
-                                                                    <Input
-                                                                        required
-                                                                        className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
-                                                                        value={formData.leadInfo.company}
-                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, company: e.target.value } }))}
-                                                                    />
-                                                                </div>
+
                                                                 <div className="space-y-1.5">
                                                                     <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5"><Phone size={12} /> Mobile</Label>
                                                                     <Input
@@ -400,17 +362,15 @@ GST Number: ${formData.leadInfo.gstNumber}
                                                                         onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, location: e.target.value } }))}
                                                                     />
                                                                 </div>
-                                                                {formData.gst === 'yes' && (
-                                                                    <div className="space-y-1.5 md:col-span-2">
-                                                                        <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">GST Number</Label>
-                                                                        <Input
-                                                                            required
-                                                                            className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
-                                                                            value={formData.leadInfo.gstNumber}
-                                                                            onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, gstNumber: e.target.value } }))}
-                                                                        />
-                                                                    </div>
-                                                                )}
+                                                                <div className="space-y-1.5 md:col-span-2">
+                                                                    <Label className="text-[10px] md:text-xs uppercase tracking-wider opacity-60 flex items-center gap-1.5">GST Number (Optional)</Label>
+                                                                    <Input
+                                                                        className="h-10 md:h-12 text-sm md:text-base bg-secondary/10 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                                                                        value={formData.leadInfo.gstNumber}
+                                                                        onChange={e => setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, gstNumber: e.target.value } }))}
+                                                                        placeholder="Enter GST Number if available"
+                                                                    />
+                                                                </div>
                                                             </div>
                                                             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-12 md:h-14 text-base md:text-lg font-medium rounded-xl transition-all">
                                                                 Submit & Enter Site <Send size={18} />
@@ -468,8 +428,14 @@ GST Number: ${formData.leadInfo.gstNumber}
                                                 if (e.key === 'Enter') {
                                                     const value = e.currentTarget.value;
                                                     if (value.trim()) {
-                                                        const redirectAction = () => handleWhatsAppRedirect(value);
-                                                        redirectAction();
+                                                        if (currentStep === 'business_name') {
+                                                            setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, company: value } }));
+                                                            addMessage({ type: 'user', text: value });
+                                                            nextStep('buyer_type');
+                                                        } else {
+                                                            const redirectAction = () => handleWhatsAppRedirect(value);
+                                                            redirectAction();
+                                                        }
                                                         e.currentTarget.value = '';
                                                     }
                                                 }
@@ -479,8 +445,15 @@ GST Number: ${formData.leadInfo.gstNumber}
                                             onClick={() => {
                                                 const input = document.querySelector<HTMLInputElement>('input[placeholder="Ask us anything..."]');
                                                 if (input?.value.trim()) {
-                                                    const redirectAction = () => handleWhatsAppRedirect(input.value);
-                                                    redirectAction();
+                                                    const value = input.value;
+                                                    if (currentStep === 'business_name') {
+                                                        setFormData(prev => ({ ...prev, leadInfo: { ...prev.leadInfo, company: value } }));
+                                                        addMessage({ type: 'user', text: value });
+                                                        nextStep('buyer_type');
+                                                    } else {
+                                                        const redirectAction = () => handleWhatsAppRedirect(value);
+                                                        redirectAction();
+                                                    }
                                                     input.value = '';
                                                 }
                                             }}

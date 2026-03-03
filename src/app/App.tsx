@@ -5,7 +5,7 @@ import { Footer } from './components/Footer';
 import { ChatBot } from './components/ChatBot';
 import ScrollToTop from './components/ScrollToTop';
 import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
+
 import { CategoryPage } from './pages/CategoryPage';
 import { ProductPage } from './pages/ProductPage';
 import { QuotePage } from './pages/QuotePage';
@@ -71,7 +71,7 @@ export default function App() {
                 <main className="flex-1">
                   <Routes>
                     <Route path="/home" element={<HomePage />} />
-                    <Route path="/about" element={<AboutPage />} />
+
                     <Route path="/products" element={<ProductsPage />} />
                     <Route path="/categories/:categoryId" element={<CategoryPage />} />
                     <Route path="/products/:productId" element={<ProductPage />} />

@@ -380,11 +380,46 @@ app.patch('/api/admin/categories/:id', requireAuth, async (req, res) => {
 app.delete('/api/admin/categories/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
+
+        // 1. Find all products in this category to clean up their images
+        const productsInTargetCategory = await prisma.product.findMany({
+            where: { categoryId: id as string },
+            select: { id: true, image: true }
+        });
+
+        // 2. Clean up product images from Cloudinary/Local storage
+        for (const product of productsInTargetCategory) {
+            if (product.image) {
+                try {
+                    if (product.image.includes('cloudinary.com')) {
+                        const parts = product.image.split('/');
+                        const filenameWithExtension = parts[parts.length - 1];
+                        const publicId = `sakshi_products/${filenameWithExtension.split('.')[0]}`;
+                        await cloudinary.uploader.destroy(publicId);
+                    } else {
+                        const filePath = path.join(__dirname, '..', product.image);
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                        }
+                    }
+                } catch (imgError) {
+                    console.error(`Failed to delete image for product ${product.id}:`, imgError);
+                }
+            }
+        }
+
+        // 3. Delete all products in this category
+        await prisma.product.deleteMany({
+            where: { categoryId: id as string }
+        });
+
+        // 4. Finally delete the category itself
         await prisma.category.delete({ where: { id: id as string } });
-        res.json({ message: 'Category deleted' });
-    } catch (error) {
+
+        res.json({ message: 'Category and all associated products deleted successfully' });
+    } catch (error: any) {
         console.error('Delete category error:', error);
-        res.status(500).json({ error: 'Failed to delete category' });
+        res.status(500).json({ error: error.message || 'Failed to delete category' });
     }
 });
 

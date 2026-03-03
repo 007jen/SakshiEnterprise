@@ -18,7 +18,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm text-primary-foreground/80">
-              Your trusted supplier of Ayurvedic and healthcare   products committed to promoting quality, reliability, and customer satisfaction.
+              Your trusted supplier of Ayurvedic and healthcare products committed to promoting quality, reliability, and customer satisfaction.
             </p>
           </div>
 
@@ -31,11 +31,7 @@ export function Footer() {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link to="/about" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  About Us
-                </Link>
-              </li>
+
               <li>
                 <Link to="/quote" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                   Get a Quote

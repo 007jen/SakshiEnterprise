@@ -133,9 +133,7 @@ export function Header() {
               Home
             </Link>
 
-            <Link to="/about" className={`${navigationMenuTriggerStyle()} !bg-transparent !text-white hover:!text-white/80 !text-base`}>
-              About
-            </Link>
+
 
             <NavigationMenu>
               <NavigationMenuList>

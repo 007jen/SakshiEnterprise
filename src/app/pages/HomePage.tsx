@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Users, Clock, Shield, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { motion, AnimatePresence } from 'motion/react';
 import { testimonials } from '../data/products';
 import Banner from '../../assets/Dark1.jpeg';
 import GoldenImage from '../../assets/goldenImage.jpg';
-import AboutImage from '../../assets/home.png';
 import ZanduLogo from '../../assets/ZanDu.png';
 import BaidyanathLogo from '../../assets/Baidyanath.png';
 import SanduLogo from '../../assets/Sandu.png';
@@ -69,7 +68,7 @@ const slides = [
 ];
 
 export function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,60 +117,78 @@ export function HomePage() {
       <section className="relative w-full bg-[#f0fdf4] pt-14 sm:pt-16 lg:pt-20">
         <div className="flex flex-col">
           {/* Image Content (Banner) */}
-          <div className="w-full overflow-hidden order-first mb-4 bg-[#f0fdf4]">
+          {/* Image Content (Banner) */}
+          <div className="w-full overflow-hidden order-first mb-4 bg-[#f0fdf4] px-4 md:px-8 pt-6 md:pt-10 pb-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.7 }}
-                className="w-full flex justify-center bg-[#f0fdf4]"
+                className="w-full flex justify-center relative"
               >
                 <img
                   src={slides[currentSlide].image}
                   alt={slides[currentSlide].title}
-                  className="h-auto max-h-[60vh] object-contain"
+                  className="h-auto max-h-[40vh] object-contain rounded-3xl shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500"
                 />
               </motion.div>
             </AnimatePresence>
           </div>
 
           {/* Text Content */}
-          <div className="w-full relative z-10 py-8">
-            <div className="bg-transparent w-full px-6 md:px-12">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentSlide}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  // transition={{ duration: 0.5 }}
-                  className="text-center space-y-6"
-                >
-                  <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-primary leading-[1.1]">
-                    {slides[currentSlide].title}
-                  </h1>
+          <div className="w-full relative z-10 py-8 md:py-12">
+            <div className="container mx-auto px-4 max-w-6xl">
+              <div className="text-center mb-12">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-primary leading-[1.2] font-serif mb-6">
+                  Ayurvedic & Healthcare Solutions
+                </h1>
+                <p className="text-lg md:text-xl text-[#40916c] leading-relaxed mx-auto font-medium max-w-4xl">
+                  We are a trusted supplier connecting pharmacies, retailers, and healthcare partners with authentic Ayurvedic and selected healthcare essentials. With a focus on ethical sourcing and dependable supply, our goal is to enhance everyday health through reliable healthcare distribution.
+                </p>
+              </div>
 
-                  <h2 className="text-xl md:text-2xl font-medium text-secondary/80">
-                    {slides[currentSlide].subtitle}
-                  </h2>
+              <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
+                {/* Vision */}
+                <Card className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-none rounded-3xl p-8 text-center hover:shadow-lg transition-shadow">
+                  <h3 className="text-2xl font-bold text-[#2d6a4f] mb-4 tracking-tight">Our Vision</h3>
+                  <p className="text-[#40916c] leading-relaxed">
+                    To become a dependable and recognized name in the healthcare distribution sector by delivering trusted products that support healthier communities.
+                  </p>
+                </Card>
 
-                  <div className="flex flex-wrap gap-4 pt-4 justify-center">
-                    <Link to="/products">
-                      <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/5 text-lg px-8 py-6 h-auto transition-all rounded-full min-w-[200px]">
-                        Explore Products
-                      </Button>
-                    </Link>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                {/* Mission */}
+                <Card className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-none rounded-3xl p-8 text-center hover:shadow-lg transition-shadow">
+                  <h3 className="text-2xl font-bold text-[#2d6a4f] mb-4 tracking-tight">Our Mission</h3>
+                  <p className="text-[#40916c] leading-relaxed">
+                    To provide genuine products, maintain consistent quality, and build long-term relationships while promoting preventive and natural healthcare solutions.
+                  </p>
+                </Card>
+
+                {/* Commitment */}
+                <Card className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-none rounded-3xl p-8 text-center hover:shadow-lg transition-shadow">
+                  <h3 className="text-2xl font-bold text-[#2d6a4f] mb-4 tracking-tight">Our Commitment</h3>
+                  <p className="text-[#40916c] leading-relaxed">
+                    We are committed to delivering products that meet expectations of quality, authenticity, and reliability to support our partners with dependable service.
+                  </p>
+                </Card>
+              </div>
+
+              <div className="flex justify-center">
+                <Link to="/products">
+                  <Button size="lg" className="bg-[#2d6a4f] hover:bg-[#1b4332] text-white text-lg px-10 py-6 h-auto transition-all rounded-full shadow-md hover:shadow-xl hover:-translate-y-1">
+                    Explore Products
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
+
       {/* About Section */}
-      <section className="py-20 bg-background">
+      {/* <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -213,7 +230,7 @@ export function HomePage() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Ayurvedic Brands Section */}
       <section className="py-20 bg-muted">
@@ -266,7 +283,7 @@ export function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-12 md:py-20 bg-muted">
+      {/* <section className="py-12 md:py-20 bg-muted">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 md:mb-12">
             <h2 className="text-3xl md:text-4xl mb-3 md:mb-4">Why Choose Sakshi Enterprise</h2>
@@ -325,7 +342,7 @@ export function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Featured Products */}
       <section className="py-12 md:py-20">
@@ -415,27 +432,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-10 md:py-12 bg-gradient-to-br from-primary to-secondary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl md:text-3xl mb-4">Looking for a Reliable Healthcare Partner?</h2>
-          <p className="text-base md:text-lg text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Let us help you support healthier communities with our solutions
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link to="/quote" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-slate-100 text-primary px-6 py-4 h-auto text-base">
-                Get a Quote
-              </Button>
-            </Link>
-            <Link to="/contact" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-6 py-4 h-auto text-base !bg-transparent">
-                Contact Us
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+
     </div>
   );
 }
