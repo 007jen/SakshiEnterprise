@@ -97,8 +97,6 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept']
 }));
 
-// Explicitly handle OPTIONS reqs for preflight
-app.options('*', cors());
 app.use(generalLimiter);
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ limit: '50kb', extended: true }));
