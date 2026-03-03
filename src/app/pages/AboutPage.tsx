@@ -6,7 +6,7 @@ import { motion } from 'motion/react';
 
 export function AboutPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f0fdf4]">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary to-secondary text-primary-foreground pt-24 sm:pt-32 pb-12 sm:pb-20">
         <div className="container mx-auto px-4">
@@ -16,15 +16,15 @@ export function AboutPage() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl"
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6 leading-tight">About Nishyash Gift Studio</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6 leading-tight">About Sakshi Enterprise</h1>
             <p className="text-lg sm:text-xl text-primary-foreground/90">
-              Your trusted partner in creating meaningful corporate and personalised gifting experiences that leave lasting impressions.
+              A trusted supplier of Ayurvedic and healthcare  products committed to quality and customer satisfaction.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Our Story */}
+      {/* Our Story / About Us */}
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
@@ -34,15 +34,12 @@ export function AboutPage() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-4xl mb-4 md:mb-6">Our Story</h2>
+              <h2 className="text-3xl md:text-4xl mb-4 md:mb-6">About Us</h2>
               <p className="text-base md:text-lg text-muted-foreground mb-4">
-                Founded with a vision to revolutionize corporate gifting, Nishyash Corporation has grown into a trusted name in the industry. We understand that gifts are more than just products – they're expressions of appreciation, recognition, and connection.
+                Sakshi Enterprise is a trusted supplier of Ayurvedic and healthcare  products committed to promoting quality, reliability, and customer satisfaction. We specialize in supplying authentic Ayurvedic preparations and selected healthcare essentials to pharmacies, retailers, distributors, and healthcare partners.
               </p>
               <p className="text-base md:text-lg text-muted-foreground mb-4">
-                Our journey began with a simple belief: every gift should tell a story and create a lasting impression. Today, we serve hundreds of businesses across industries, helping them strengthen relationships through thoughtfully curated gifts.
-              </p>
-              <p className="text-base md:text-lg text-muted-foreground">
-                With a commitment to quality, customization, and timely delivery, we've become the go-to partner for organizations seeking premium gifting solutions.
+                With a focus on ethical sourcing, dependable supply, and customer-first service, we aim to support businesses with products that enhance everyday health and . At Sakshi Enterprise, we believe healthcare distribution is not just business — it is responsibility.
               </p>
             </motion.div>
             <motion.div
@@ -52,8 +49,8 @@ export function AboutPage() {
               viewport={{ once: true }}
             >
               <img
-                src="https://images.unsplash.com/photo-1496180470114-6ef490f3ff22"
-                alt="Our Team"
+                src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b"
+                alt="Ayurvedic "
                 className="rounded-lg shadow-xl"
               />
             </motion.div>
@@ -61,36 +58,83 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Our Values */}
+      {/* Vision & Mission */}
       <section className="py-20 bg-muted">
         <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-2xl shadow-sm border border-border"
+            >
+              <h2 className="text-3xl mb-6 text-primary">Our Vision</h2>
+              <p className="text-lg text-muted-foreground">
+                To become a dependable and recognized name in the healthcare distribution sector by delivering trusted  products that support healthier communities.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-2xl shadow-sm border border-border"
+            >
+              <h2 className="text-3xl mb-6 text-primary">Our Mission</h2>
+              <ul className="space-y-4">
+                {[
+                  "To provide genuine Ayurvedic and  products",
+                  "To maintain consistent quality and reliable supply",
+                  "To build long-term relationships with partners and customers",
+                  "To promote preventive and natural healthcare solutions"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-muted-foreground">
+                    <CheckCircle className="text-primary mt-1 flex-shrink-0" size={20} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Values / Why Choose Us */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Our Values</h2>
+            <h2 className="text-4xl mb-4">Why Choose Sakshi Enterprise</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              The principles that guide everything we do
+              Our commitment to authenticity and reliability defines our partnership.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             {[
               {
-                icon: <Award className="text-accent" size={32} />,
+                icon: <Award className="text-primary" size={32} />,
+                title: 'Trusted Sourcing',
+                description: 'Ethically sourced and authentic products'
+              },
+              {
+                icon: <TrendingUp className="text-primary" size={32} />,
+                title: 'Reliable Supply',
+                description: 'Dependable and timely distribution network'
+              },
+              {
+                icon: <Users className="text-primary" size={32} />,
+                title: 'Partner Focused',
+                description: 'Long-term business partnership mindset'
+              },
+              {
+                icon: <Heart className="text-primary" size={32} />,
                 title: 'Quality First',
-                description: 'We never compromise on the quality of our products and services'
+                description: 'Commitment to high product standards'
               },
               {
-                icon: <Heart className="text-accent" size={32} />,
-                title: 'Customer Focus',
-                description: 'Your satisfaction and success are at the heart of what we do'
-              },
-              {
-                icon: <TrendingUp className="text-accent" size={32} />,
-                title: 'Innovation',
-                description: 'Constantly evolving to bring you the latest gifting trends'
-              },
-              {
-                icon: <CheckCircle className="text-accent" size={32} />,
-                title: 'Reliability',
-                description: 'Delivering on our promises, every single time'
+                icon: <CheckCircle className="text-primary" size={32} />,
+                title: 'Competitive',
+                description: 'Attractive and fair pricing structure'
               }
             ].map((value, index) => (
               <motion.div
@@ -100,10 +144,10 @@ export function AboutPage() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card>
+                <Card className="h-full">
                   <CardContent className="p-6 text-center">
-                    <div className="mb-4">{value.icon}</div>
-                    <h3 className="mb-2">{value.title}</h3>
+                    <div className="mb-4 flex justify-center">{value.icon}</div>
+                    <h3 className="mb-2 text-xl">{value.title}</h3>
                     <p className="text-sm text-muted-foreground">{value.description}</p>
                   </CardContent>
                 </Card>
@@ -113,104 +157,38 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">Why Businesses Trust Us</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              What sets us apart in the corporate gifting industry
+      {/* Commitment */}
+      <section className="py-20 bg-primary/5">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto bg-white p-12 rounded-3xl shadow-xl border border-primary/20"
+          >
+            <h2 className="text-3xl md:text-4xl mb-6 text-primary font-bold">Our Commitment</h2>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+              We are committed to delivering products that meet expectations of quality, authenticity, and reliability. Our goal is to support our partners with dependable service so they can confidently serve their customers.
             </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                number: '1000+',
-                label: 'Happy Clients',
-                description: 'Businesses across industries trust us'
-              },
-              {
-                number: '10000+',
-                label: 'Orders Delivered',
-                description: 'Successfully completed projects'
-              },
-              {
-                number: '99%',
-                label: 'On-Time Delivery',
-                description: 'Meeting deadlines consistently'
-              }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="text-center">
-                  <CardContent className="p-8">
-                    <div className="text-5xl text-accent mb-2">{stat.number}</div>
-                    <h3 className="mb-2">{stat.label}</h3>
-                    <p className="text-sm text-muted-foreground">{stat.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What We Offer */}
-      <section className="py-20 bg-muted">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl mb-4">What We Offer</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive gifting solutions for all your needs
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {[
-              'Wide range of premium products',
-              'Custom branding and personalization',
-              'Bulk order discounts',
-              'Dedicated account management',
-              'Quick turnaround times',
-              'Quality assurance guarantee',
-              'Flexible payment options',
-              'Pan-India delivery network'
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex items-center space-x-3"
-              >
-                <CheckCircle className="text-accent flex-shrink-0" size={24} />
-                <span className="text-lg">{item}</span>
-              </motion.div>
-            ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-16 md:py-20 bg-gradient-to-br from-primary to-secondary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl mb-6">Ready to Partner With Us?</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl mb-6 font-bold">Partner with Sakshi Enterprise</h2>
           <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Let's create memorable gifting experiences together
+            Let's build a healthier community together through trusted  products.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/quote" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 h-auto text-lg">
+              <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-slate-100 text-primary px-8 py-6 h-auto text-lg">
                 Get a Quote
               </Button>
             </Link>
             <Link to="/contact" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 h-auto text-lg">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 h-auto text-lg !bg-transparent">
                 Contact Us
               </Button>
             </Link>

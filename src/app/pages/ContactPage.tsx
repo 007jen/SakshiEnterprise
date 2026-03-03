@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { motion } from 'motion/react';
+import { getWhatsAppLink } from '../utils/helpers';
 
 export function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -46,16 +47,17 @@ export function ContactPage() {
   };
 
   const handleWhatsApp = () => {
-    const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9082035278';
-    const cleanNumber = rawNumber.replace(/\D/g, '');
-    const formattedNumber = cleanNumber.startsWith('91') ? cleanNumber : `91${cleanNumber}`;
-    const message = encodeURIComponent('Hi, I would like to get in touch with Nishyash Corporation.');
-    window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
+    const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9326347507';
+    const message = "Hi, I'm interested in Ayurvedic products from Sakshi Enterprise. Can we connect?";
+    const whatsappLink = getWhatsAppLink(rawNumber, message);
+    if (whatsappLink) {
+      window.open(whatsappLink, '_blank');
+    }
   };
 
 
   return (
-    <div className="min-h-screen pt-24 sm:pt-32 pb-12 sm:pb-20">
+    <div className="min-h-screen pt-24 sm:pt-32 pb-12 sm:pb-20 bg-[#f8fafc]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10 md:mb-12">
           <motion.div
@@ -82,12 +84,12 @@ export function ContactPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Mail className="text-accent" size={24} />
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Mail className="text-primary" size={24} />
                     </div>
                     <div>
                       <h3 className="mb-2">Email Us</h3>
-                      <p className="text-muted-foreground">{(import.meta.env.VITE_ADMIN_EMAIL || 'info@nishyash.com').split(',')[0].trim()}</p>
+                      <p className="text-muted-foreground">{(import.meta.env.VITE_ADMIN_EMAIL || 'info@sakshienterprise.com').split(',')[0].trim()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -96,14 +98,14 @@ export function ContactPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Phone className="text-accent" size={24} />
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Phone className="text-primary" size={24} />
                     </div>
                     <div>
                       <h3 className="mb-2">Call Us</h3>
                       <p className="text-muted-foreground">
-                        +91 93263 47507<br />
-                        +91 836 916 2195
+                        +91 93263 47507 (WhatsApp)<br />
+                        +91 89282 23528
                       </p>
                     </div>
                   </div>
@@ -113,16 +115,15 @@ export function ContactPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <MapPin className="text-accent" size={24} />
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <MapPin className="text-primary" size={24} />
                     </div>
                     <div>
                       <h3 className="mb-2">Visit Us</h3>
                       <p className="text-muted-foreground">
-                        Nishyash Corporation<br />
-                        Business Center,Flat no.28, <br />
-                        Humlog Society, Kandivali West, <br />
-                        Mumbai, Maharashtra 400067,India
+                        Sakshi Enterprise<br />
+                        Business Center, Andheri East, <br />
+                        Mumbai, Maharashtra 400069, India
                       </p>
                     </div>
                   </div>
@@ -173,7 +174,7 @@ export function ContactPage() {
                     Thank you for reaching out. We have received your message and will get back to you within 24 hours.
                   </p>
                   <Link to="/home">
-                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground mt-4">
+                    <Button size="lg" className="bg-primary hover:bg-primary/90 text-white mt-4">
                       Back to Home
                     </Button>
                   </Link>
@@ -248,7 +249,7 @@ export function ContactPage() {
                       type="submit"
                       size="lg"
                       disabled={isSubmitting}
-                      className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                      className="w-full bg-primary hover:bg-primary/90 text-white"
                     >
                       {isSubmitting ? 'Sending Message...' : 'Send Message'}
                     </Button>

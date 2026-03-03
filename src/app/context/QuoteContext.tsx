@@ -32,7 +32,7 @@ export function QuoteProvider({ children }: { readonly children: ReactNode }) {
 
     // Load from local storage on mount
     useEffect(() => {
-        const savedQuote = localStorage.getItem('nishyash_quote_cart');
+        const savedQuote = localStorage.getItem('sakshi_quote_cart');
         if (savedQuote) {
             try {
                 setItems(JSON.parse(savedQuote));
@@ -44,7 +44,7 @@ export function QuoteProvider({ children }: { readonly children: ReactNode }) {
 
     // Save to local storage whenever items change
     useEffect(() => {
-        localStorage.setItem('nishyash_quote_cart', JSON.stringify(items));
+        localStorage.setItem('sakshi_quote_cart', JSON.stringify(items));
     }, [items]);
 
     const addToQuote = useCallback((product: Product, quantity: number, customNotes?: string) => {

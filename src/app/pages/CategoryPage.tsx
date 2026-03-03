@@ -1,26 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Seo } from '../components/SEO';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
 import { motion } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  inStock: boolean;
-  tags?: string[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  products?: Product[];
-}
+import { Category, Product } from '../types';
+import { ProductCard } from '../components/ProductCard';
+import { Button } from '../components/ui/button';
 
 export function CategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -49,7 +35,7 @@ export function CategoryPage() {
   if (loading) {
     return (
       <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
-        <Loader2 className="animate-spin text-accent" size={48} />
+        <Loader2 className="animate-spin text-primary" size={48} />
       </div>
     );
   }
@@ -68,10 +54,10 @@ export function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f0fdf4]">
       <Seo
         title={category.name}
-        description={`Explore our selection of ${category.name}. Premium corporate and personalised gifts.`}
+        description={`Explore our selection of ${category.name}. Authentic Ayurvedic and healthcare wellness products from Sakshi Enterprise.`}
       />
       {/* Category Hero */}
       <section className="bg-gradient-to-br from-primary to-secondary text-primary-foreground pt-24 sm:pt-32 pb-8 sm:pb-12">
@@ -100,35 +86,13 @@ export function CategoryPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                   >
-                    <Link to={`/products/${product.id}`}>
-                      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-                        <div className="h-56 overflow-hidden bg-muted">
-                          <img
-                            src={product.image?.startsWith('/uploads') ? `${apiBaseUrl}${product.image}` : product.image || 'https://placehold.co/600x400?text=No+Image'}
-                            alt={product.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        </div>
-                        <CardContent className="p-6 flex-1 flex flex-col">
-                          <h3 className="mb-2">{product.name}</h3>
-                          {/* <p className="text-sm text-muted-foreground mb-4 flex-1">
-                            {product.description}
-                          </p> */}
-                          <div className="flex justify-end items-center mt-auto">
-                            {/* <span className="font-bold text-accent">₹{product.price}</span> */}
-                            <Button variant="outline" size="sm">
-                              View Details
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                    <ProductCard key={product.id} product={product} />
                   </motion.div>
                 ))}
               </div>
               <div className="mt-12 text-center p-8 bg-muted/50 rounded-xl border border-border">
-                <h3 className="text-2xl font-semibold mb-2">Customization & Bulk Orders Available</h3>
-                <p className="text-muted-foreground">Contact us today for personalized gifting solutions and bulk order discounts!</p>
+                <h3 className="text-2xl font-semibold mb-2">Bulk Orders & Healthcare Partnerships</h3>
+                <p className="text-muted-foreground">Contact us today for authentic wellness products and reliable healthcare distribution!</p>
               </div>
             </>
           ) : (
@@ -149,11 +113,11 @@ export function CategoryPage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl mb-4">Need Help Choosing?</h2>
           <p className="text-lg text-muted-foreground mb-6">
-            Our team is here to help you find the perfect gifts for your needs
+            Our team is here to help you find the right wellness products for your distribution needs
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/quote">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
                 Get a Quote
               </Button>
             </Link>

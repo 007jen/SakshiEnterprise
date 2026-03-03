@@ -1,6 +1,6 @@
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Mail, Phone, Calendar, FileText, Plus, Trash2, Edit2, ImageIcon, Save, X } from 'lucide-react';
@@ -9,7 +9,8 @@ import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+const adminEmailEnv = import.meta.env.VITE_ADMIN_EMAIL || '';
+const adminEmails = adminEmailEnv.split(',').map(e => e.trim().toLowerCase()).filter(e => e.length > 0);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 interface Lead {
@@ -55,10 +56,8 @@ interface Product {
     price: number;
     image?: string;
     inStock: boolean;
-    defaultQuantity: number;
     categoryId: string;
     category?: Category;
-    tags?: string[];
 }
 
 export default function AdminPage() {
@@ -77,7 +76,7 @@ export default function AdminPage() {
     const [categoryForm, setCategoryForm] = useState({
         name: '',
         description: '',
-        icon: 'Gift'
+        icon: 'Heart'
     });
 
     // Product Form State
@@ -88,12 +87,11 @@ export default function AdminPage() {
         description: '',
         price: '',
         categoryId: '',
-        inStock: true,
-        defaultQuantity: '1',
-        tags: ''
+        inStock: true
     });
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+    const navigate = useNavigate();
     const fetchData = async () => {
         try {
             const token = await getToken();
@@ -107,6 +105,12 @@ export default function AdminPage() {
                 fetch(`${apiBaseUrl}/api/categories`),
                 fetch(`${apiBaseUrl}/api/products`)
             ]);
+
+            if (leadsRes.status === 403 || quotesRes.status === 403) {
+                toast.error("Access Denied: You are not authorized as an admin in the database.");
+                navigate('/');
+                return;
+            }
 
             if (leadsRes.ok && quotesRes.ok && categoriesRes.ok && productsRes.ok) {
                 const leadsData = await leadsRes.json();
@@ -126,34 +130,10 @@ export default function AdminPage() {
     };
 
     useEffect(() => {
-        if (isLoaded && isSignedIn && user) {
-            const userEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-            const adminEmails = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e: string) => e.trim().toLowerCase());
-
-            if (!adminEmails.includes(userEmail)) {
-                toast.error(`Security alert: Unauthorized access attempt from ${userEmail}`);
-            }
-        }
-    }, [isLoaded, isSignedIn, user]);
-
-    useEffect(() => {
         if (isSignedIn) {
             fetchData();
         }
     }, [isSignedIn]);
-
-    // Security Redirect MUST happen after all hooks
-    if (isLoaded && isSignedIn) {
-        const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
-        const adminEmails = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e: string) => e.trim().toLowerCase());
-
-        if (!adminEmails.includes(userEmail)) {
-            return <Navigate to="/home" />;
-        }
-    }
-
-    if (!isLoaded) return <div className="min-h-screen flex items-center justify-center text-accent">Loading auth...</div>;
-    if (!isSignedIn) return <Navigate to="/" />;
 
 
     const handleCategorySubmit = async (e: React.FormEvent) => {
@@ -176,7 +156,7 @@ export default function AdminPage() {
 
             if (res.ok) {
                 toast.success(editingCategory ? 'Category updated' : 'Category added');
-                setCategoryForm({ name: '', description: '', icon: 'Gift' });
+                setCategoryForm({ name: '', description: '', icon: 'Heart' });
                 setIsAddingCategory(false);
                 setEditingCategory(null);
                 fetchData();
@@ -218,8 +198,6 @@ export default function AdminPage() {
             formData.append('price', productForm.price);
             formData.append('categoryId', productForm.categoryId);
             formData.append('inStock', String(productForm.inStock));
-            formData.append('defaultQuantity', productForm.defaultQuantity);
-            formData.append('tags', productForm.tags);
             if (selectedFile) {
                 formData.append('image', selectedFile);
             }
@@ -243,9 +221,7 @@ export default function AdminPage() {
                     description: '',
                     price: '',
                     categoryId: '',
-                    inStock: true,
-                    defaultQuantity: '1',
-                    tags: ''
+                    inStock: true
                 });
                 setSelectedFile(null);
                 setIsAddingProduct(false);
@@ -265,9 +241,7 @@ export default function AdminPage() {
             description: product.description || '',
             price: String(product.price),
             categoryId: product.categoryId,
-            inStock: product.inStock,
-            defaultQuantity: String(product.defaultQuantity),
-            tags: product.tags?.join(', ') || ''
+            inStock: product.inStock
         });
         setSelectedFile(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -295,16 +269,25 @@ export default function AdminPage() {
     };
 
     if (!isLoaded) return <div className="min-h-screen flex items-center justify-center text-accent">Loading auth...</div>;
-    if (!isSignedIn) return <Navigate to="/" />;
+
+    const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+    const isAdmin = !!userEmail && adminEmails.includes(userEmail);
+
+    if (!isSignedIn || !isAdmin) {
+        if (isSignedIn && !isAdmin) {
+            toast.error("Unauthorized entry attempted.");
+        }
+        return <Navigate to="/" />;
+    }
 
     return (
-        <div className="min-h-screen pt-32 pb-20 px-6 bg-background">
+        <div className="min-h-screen pt-32 pb-20 px-6 bg-[#f0fdf4]">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-4xl font-bold text-accent">Admin Dashboard</h1>
+                    <h1 className="text-4xl font-bold text-primary">Admin Dashboard</h1>
                     <button
                         onClick={fetchData}
-                        className="text-sm bg-accent/10 text-accent px-4 py-2 rounded-md hover:bg-accent/20 transition-colors"
+                        className="text-sm bg-primary/10 text-primary px-4 py-2 rounded-md hover:bg-primary/20 transition-colors"
                     >
                         Refresh Data
                     </button>
@@ -322,7 +305,7 @@ export default function AdminPage() {
                         {/* ... Existing Leads Content ... */}
                         <div className="grid gap-6">
                             {leads.map((lead) => (
-                                <Card key={lead.id} className="border-accent/20">
+                                <Card key={lead.id} className="border-primary/20">
                                     <CardHeader className="flex flex-row items-center justify-between">
                                         <CardTitle className="text-xl">
                                             {lead.firstName} {lead.lastName}
@@ -335,16 +318,16 @@ export default function AdminPage() {
                                     <CardContent>
                                         <div className="grid md:grid-cols-2 gap-4 mb-4">
                                             <div className="flex items-center gap-2 text-sm">
-                                                <Mail size={16} className="text-accent" />
+                                                <Mail size={16} className="text-primary" />
                                                 {lead.email}
                                             </div>
                                             <div className="flex items-center gap-2 text-sm">
-                                                <Phone size={16} className="text-accent" />
+                                                <Phone size={16} className="text-primary" />
                                                 {lead.phone || 'No phone provided'}
                                             </div>
                                         </div>
-                                        <div className="p-4 bg-muted/50 rounded-md border border-accent/10">
-                                            <h4 className="font-semibold text-sm mb-2 uppercase tracking-wider text-accent/70">{lead.subject}</h4>
+                                        <div className="p-4 bg-muted/50 rounded-md border border-primary/10">
+                                            <h4 className="font-semibold text-sm mb-2 uppercase tracking-wider text-primary/70">{lead.subject}</h4>
                                             <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{lead.message}</p>
                                         </div>
                                     </CardContent>
@@ -360,7 +343,7 @@ export default function AdminPage() {
                         {/* ... Existing Quotes Content ... */}
                         <div className="grid gap-6">
                             {quotes.map((quote) => (
-                                <Card key={quote.id} className="border-accent/20">
+                                <Card key={quote.id} className="border-primary/20">
                                     <CardHeader className="flex flex-row items-center justify-between">
                                         <CardTitle className="text-xl">
                                             {quote.fullName} <span className="text-sm font-normal text-muted-foreground">({quote.companyName})</span>
@@ -373,32 +356,32 @@ export default function AdminPage() {
                                     <CardContent>
                                         <div className="grid md:grid-cols-2 gap-4 mb-4">
                                             <div className="flex items-center gap-2 text-sm">
-                                                <Mail size={16} className="text-accent" />
+                                                <Mail size={16} className="text-primary" />
                                                 {quote.email}
                                             </div>
                                             <div className="flex items-center gap-2 text-sm">
-                                                <Phone size={16} className="text-accent" />
+                                                <Phone size={16} className="text-primary" />
                                                 {quote.phone}
                                             </div>
                                         </div>
 
                                         <div className="mb-4">
                                             <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                                                <FileText size={16} className="text-accent" />
+                                                <FileText size={16} className="text-primary" />
                                                 Requested Items:
                                             </h4>
                                             <div className="grid gap-2">
                                                 {quote.items.map((item) => (
-                                                    <div key={item.id} className="flex justify-between items-center bg-muted/30 p-2 rounded border border-accent/5">
+                                                    <div key={item.id} className="flex justify-between items-center bg-muted/30 p-2 rounded border border-primary/5">
                                                         <span className="text-sm">{item.productName}</span>
-                                                        <span className="text-sm font-bold text-accent">Qty: {item.quantity}</span>
+                                                        <span className="text-sm font-bold text-primary">Qty: {item.quantity}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
 
                                         {quote.additionalNotes && (
-                                            <div className="p-4 bg-accent/5 rounded-md border border-accent/10 italic text-sm text-foreground/70">
+                                            <div className="p-4 bg-primary/5 rounded-md border border-primary/10 italic text-sm text-foreground/70">
                                                 "{quote.additionalNotes}"
                                             </div>
                                         )}
@@ -413,13 +396,13 @@ export default function AdminPage() {
 
                     <TabsContent value="categories">
                         <div className="space-y-6">
-                            <Card className="border-accent/20">
+                            <Card className="border-primary/20">
                                 <CardHeader>
                                     <div className="flex justify-between items-center">
                                         <CardTitle className="text-xl">Categories</CardTitle>
                                         <Button
                                             onClick={() => setIsAddingCategory(!isAddingCategory)}
-                                            className="bg-accent text-accent-foreground"
+                                            className="bg-primary text-primary-foreground"
                                         >
                                             {isAddingCategory ? <X size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />}
                                             {isAddingCategory ? 'Cancel' : 'Add Category'}
@@ -428,7 +411,7 @@ export default function AdminPage() {
                                 </CardHeader>
                                 <CardContent>
                                     {(isAddingCategory || editingCategory) && (
-                                        <form onSubmit={handleCategorySubmit} className="space-y-4 mb-8 p-6 bg-accent/5 rounded-lg border border-accent/20">
+                                        <form onSubmit={handleCategorySubmit} className="space-y-4 mb-8 p-6 bg-primary/5 rounded-lg border border-primary/20">
                                             <div className="grid md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="catName">Category Name *</Label>
@@ -436,7 +419,7 @@ export default function AdminPage() {
                                                         id="catName"
                                                         value={categoryForm.name}
                                                         onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
-                                                        placeholder="e.g. Corporate Gifts"
+                                                        placeholder="e.g. Ayurvedic Preparations"
                                                         required
                                                     />
                                                 </div>
@@ -448,9 +431,9 @@ export default function AdminPage() {
                                                         value={categoryForm.icon}
                                                         onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value })}
                                                     >
-                                                        <option value="Gift">Gift (Default)</option>
-                                                        <option value="Briefcase">Briefcase (Corporate)</option>
-                                                        <option value="Heart">Heart (Personalised)</option>
+                                                        <option value="Heart">Heart (Default)</option>
+                                                        <option value="Leaf">Leaf (Wellness)</option>
+                                                        <option value="Activity">Activity (Medical)</option>
                                                         <option value="Shirt">Shirt (Apparel)</option>
                                                         <option value="Coffee">Coffee (Drinkware)</option>
                                                         <option value="FolderOpen">FolderOpen (Office)</option>
@@ -473,7 +456,7 @@ export default function AdminPage() {
                                                 <Button type="button" variant="outline" onClick={() => { setIsAddingCategory(false); setEditingCategory(null); }}>
                                                     Cancel
                                                 </Button>
-                                                <Button type="submit" className="bg-accent text-accent-foreground">
+                                                <Button type="submit" className="bg-primary text-primary-foreground">
                                                     {editingCategory ? 'Update Category' : 'Create Category'}
                                                 </Button>
                                             </div>
@@ -482,24 +465,24 @@ export default function AdminPage() {
 
                                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {categories.map((category) => (
-                                            <div key={category.id} className="flex flex-col p-4 bg-muted/30 rounded-lg border border-accent/10">
+                                            <div key={category.id} className="flex flex-col p-4 bg-muted/30 rounded-lg border border-primary/10">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div>
                                                         <h3 className="font-bold">{category.name}</h3>
                                                         <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{category.id}</p>
                                                     </div>
-                                                    <span className="text-xs font-semibold bg-accent/10 px-2 py-1 rounded">{category.products?.length || 0} Products</span>
+                                                    <span className="text-xs font-semibold bg-primary/10 px-2 py-1 rounded">{category.products?.length || 0} Products</span>
                                                 </div>
                                                 {category.description && (
                                                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4 italic">
                                                         "{category.description}"
                                                     </p>
                                                 )}
-                                                <div className="flex gap-2 mt-auto border-t border-accent/5 pt-3">
+                                                <div className="flex gap-2 mt-auto border-t border-primary/5 pt-3">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 text-xs flex-1 hover:bg-accent/10"
+                                                        className="h-8 text-xs flex-1 hover:bg-primary/10"
                                                         onClick={() => {
                                                             setEditingCategory(category);
                                                             setCategoryForm({
@@ -532,15 +515,15 @@ export default function AdminPage() {
                     <TabsContent value="products">
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                                <h2 className="text-2xl font-semibold text-accent">Manage Products</h2>
+                                <h2 className="text-2xl font-semibold text-primary">Manage Products</h2>
                                 <Button
                                     onClick={() => {
                                         setIsAddingProduct(!isAddingProduct);
                                         setEditingProduct(null);
-                                        setProductForm({ name: '', description: '', price: '', categoryId: '', inStock: true, defaultQuantity: '1', tags: '' });
+                                        setProductForm({ name: '', description: '', price: '', categoryId: '', inStock: true });
                                         setSelectedFile(null);
                                     }}
-                                    className="bg-accent text-accent-foreground"
+                                    className="bg-primary text-primary-foreground"
                                 >
                                     {isAddingProduct ? <X size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />}
                                     {isAddingProduct ? 'Cancel' : 'Add New Product'}
@@ -548,7 +531,7 @@ export default function AdminPage() {
                             </div>
 
                             {(isAddingProduct || editingProduct) && (
-                                <Card className="border-accent/40 bg-accent/5">
+                                <Card className="border-primary/40 bg-primary/5">
                                     <CardHeader>
                                         <CardTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
                                     </CardHeader>
@@ -603,22 +586,13 @@ export default function AdminPage() {
                                                         required
                                                     />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="quantity">Default Quantity</Label>
-                                                    <Input
-                                                        id="quantity"
-                                                        type="number"
-                                                        value={productForm.defaultQuantity}
-                                                        onChange={(e) => setProductForm({ ...productForm, defaultQuantity: e.target.value })}
-                                                    />
-                                                </div>
                                                 <div className="flex items-end h-10 pb-2">
                                                     <label className="flex items-center gap-2 cursor-pointer">
                                                         <input
                                                             type="checkbox"
                                                             checked={productForm.inStock}
                                                             onChange={(e) => setProductForm({ ...productForm, inStock: e.target.checked })}
-                                                            className="w-4 h-4 accent-accent"
+                                                            className="w-4 h-4 accent-primary"
                                                         />
                                                         <span className="text-sm font-medium">In Stock</span>
                                                     </label>
@@ -636,7 +610,7 @@ export default function AdminPage() {
                                                         className="flex-1"
                                                     />
                                                     {(selectedFile || editingProduct?.image) && (
-                                                        <div className="w-12 h-12 rounded border border-accent/20 overflow-hidden bg-white">
+                                                        <div className="w-12 h-12 rounded border border-primary/20 overflow-hidden bg-white">
                                                             {selectedFile ? (
                                                                 <img src={URL.createObjectURL(selectedFile)} alt="Preview" className="w-full h-full object-cover" />
                                                             ) : (
@@ -647,18 +621,6 @@ export default function AdminPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-2">
-                                                <Label htmlFor="tags">Tags (comma separated)</Label>
-                                                {/* <Input
-                                                    id="tags"
-                                                    value={productForm.tags}
-                                                    onChange={(e) => setProductForm({ ...productForm, tags: e.target.value })}
-                                                    placeholder="e.g. Bulk, Premium, Eco, New Arrival"
-                                                /> */}
-                                                <div className="mt-2 text-xs font-semibold text-accent p-2 bg-accent/5 border border-accent/20 rounded">
-                                                    Customization & bulk orders available. Contact us today!
-                                                </div>
-                                            </div>
 
                                             <div className="flex justify-end gap-3 mt-6">
                                                 <Button type="button" variant="outline" onClick={() => { setIsAddingProduct(false); setEditingProduct(null); }}>
@@ -676,7 +638,7 @@ export default function AdminPage() {
 
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {products.map((product) => (
-                                    <Card key={product.id} className="overflow-hidden border-accent/20 group">
+                                    <Card key={product.id} className="overflow-hidden border-primary/20 group">
                                         <div className="aspect-video relative bg-muted overflow-hidden">
                                             {product.image ? (
                                                 <img
@@ -701,23 +663,13 @@ export default function AdminPage() {
                                                     <h3 className="font-bold text-lg">{product.name}</h3>
                                                     <p className="text-xs text-muted-foreground">{product.category?.name}</p>
                                                 </div>
-                                                <span className="font-bold text-accent">₹{product.price}</span>
+                                                <span className="font-bold text-primary">₹{product.price}</span>
                                             </div>
 
-                                            <div className="flex flex-wrap gap-1 mb-4">
-                                                <span className="text-[9px] bg-accent/10 text-accent border border-accent/30 px-1.5 py-0.5 rounded font-semibold italic">
-                                                    Customization & bulk orders available
-                                                </span>
-                                                {product.tags && product.tags.length > 0 && product.tags.map(tag => (
-                                                    <span key={tag} className="text-[9px] bg-accent/5 text-accent border border-accent/20 px-1.5 py-0.5 rounded">
-                                                        #{tag}
-                                                    </span>
-                                                ))}
-                                            </div>
                                             <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                                                 {product.description || 'No description provided.'}
                                             </p>
-                                            <div className="flex border-t border-accent/10 pt-4 gap-2">
+                                            <div className="flex border-t border-primary/10 pt-4 gap-2">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"

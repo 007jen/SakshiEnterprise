@@ -21,8 +21,8 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
         const adminEmails = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || 'jajoshi2005@gmail.com';
 
         const { data, error } = await resend.emails.send({
-            from: 'Nishyash Studio <soulfulcreations@nishyash.com>',
-            to: adminEmails.split(',').map(e => e.trim()),
+            from: 'Sakshi Enterprise <onboarding@resend.dev>',
+            to: ['joshijenil12@gmail.com'], // Force recipient to owner address for local testing
             subject: subject,
             html: html,
         });

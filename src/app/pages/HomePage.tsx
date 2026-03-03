@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { motion, AnimatePresence } from 'motion/react';
 import { testimonials } from '../data/products';
-import Banner from '../../assets/Dark.jpeg';
+import Banner from '../../assets/Dark1.jpeg';
 import GoldenImage from '../../assets/goldenImage.jpg';
 
 interface Product {
@@ -37,8 +37,8 @@ const slides = [
   {
     id: 1,
     image: Banner,
-    title: "Corporate Gifting Solutions",
-    subtitle: "Build relationships that last.",
+    title: "Ayurvedic Wellness Solutions",
+    subtitle: "Promoting health through authentic traditions.",
     ctaText: "Request Bulk Quote",
     ctaLink: "/quote",
     description: ""
@@ -46,10 +46,10 @@ const slides = [
   {
     id: 2,
     image: GoldenImage,
-    title: "Personalized for Loved Ones",
-    subtitle: "Make every occasion special.",
-    ctaText: "Shop Collection",
-    ctaLink: "/products", // Anchor link to products
+    title: "Essential Healthcare Products",
+    subtitle: "Reliable supply for your wellness needs.",
+    ctaText: "Explore Products",
+    ctaLink: "/products",
     description: ""
   }
 ];
@@ -77,54 +77,60 @@ export function HomePage() {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+  // Commented out auto-sliding animation as per user request
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentSlide((prev) => (prev + 1) % slides.length);
+  //   }, 5000);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f0fdf4]">
       {/* Hero Section */}
-      <section className="relative w-full bg-background pt-14 sm:pt-16 lg:pt-20">
+      <section className="relative w-full bg-[#f0fdf4] pt-14 sm:pt-16 lg:pt-20">
         <div className="flex flex-col">
+          {/* Image Content (Banner) */}
+          <div className="w-full overflow-hidden order-first mb-4 bg-[#f0fdf4]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.7 }}
+                className="w-full flex justify-center bg-[#f0fdf4]"
+              >
+                <img
+                  src={slides[currentSlide].image}
+                  alt={slides[currentSlide].title}
+                  className="h-auto max-h-[60vh] object-contain"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
           {/* Text Content */}
-          <div className="w-full relative z-10 mb-20">
-            <div className="bg-white w-full p-8 md:p-12 transition-all duration-500 hover:bg-[#d4af37]/10 hover:shadow-[0_0_30px_rgba(212,175,55,0.2)]">
+          <div className="w-full relative z-10 py-8">
+            <div className="bg-transparent w-full px-6 md:px-12">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  // transition={{ duration: 0.5 }}
                   className="text-center space-y-6"
                 >
-                  <div>
-                    {/* <Badge variant="outline" className="mb-4 text-primary border-primary/20 px-4 py-1 rounded-full">
-                      {currentSlide === 0 ? "Corporate Solutions" : "Personal Gifting"}
-                    </Badge> */}
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-primary leading-[1.1]">
-                      {slides[currentSlide].title}
-                    </h1>
-                  </div>
+                  <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-primary leading-[1.1]">
+                    {slides[currentSlide].title}
+                  </h1>
 
                   <h2 className="text-xl md:text-2xl font-medium text-secondary/80">
                     {slides[currentSlide].subtitle}
                   </h2>
 
-                  <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                    {slides[currentSlide].description}
-                  </p>
-
                   <div className="flex flex-wrap gap-4 pt-4 justify-center">
-                    {/* <Link to={slides[currentSlide].ctaLink}>
-                      <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-6 h-auto transition-all rounded-full min-w-[200px]">
-                        {slides[currentSlide].ctaText}
-                        <ArrowRight className="ml-2" size={20} />
-                      </Button>
-                    </Link> */}
                     <Link to="/products">
                       <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/5 text-lg px-8 py-6 h-auto transition-all rounded-full min-w-[200px]">
                         Explore Products
@@ -134,31 +140,6 @@ export function HomePage() {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
-
-          {/* Image Content (Banner) */}
-          <div className="relative w-full overflow-hidden order-first">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.7 }}
-                className="relative md:absolute md:inset-0"
-              >
-                <img
-                  src={slides[currentSlide].image}
-                  alt={slides[currentSlide].title}
-                  className="w-full h-56 sm:h-72 md:h-full object-cover"
-                />
-
-                {/* Subtle gradient overlay at the bottom for better edge definition if needed */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent lg:hidden" />
-              </motion.div>
-            </AnimatePresence>
-            {/* Height placeholder for MD+ screens where content is absolute */}
-            <div className="hidden md:block h-[50vh] lg:h-[60vh]" />
           </div>
         </div>
       </section>
@@ -173,22 +154,22 @@ export function HomePage() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl mb-6">About Nishyash </h2>
+              <h2 className="text-4xl mb-6">About Sakshi Enterprise</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                We are a leading provider of corporate and personalised gifting solutions, dedicated to helping businesses create lasting impressions. With years of experience in the industry, we understand the importance of quality, customization, and timely delivery.
+                We are a trusted supplier of Ayurvedic and healthcare  products committed to promoting quality, reliability, and customer satisfaction. We specialize in authentic Ayurvedic preparations and essential healthcare products.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <CheckCircle className="text-accent" size={24} />
-                  <span>Premium quality products</span>
+                  <CheckCircle className="text-primary" size={24} />
+                  <span>Genuine Ayurvedic products</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <CheckCircle className="text-accent" size={24} />
-                  <span>Custom branding options</span>
+                  <CheckCircle className="text-primary" size={24} />
+                  <span>Dependable healthcare supply</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <CheckCircle className="text-accent" size={24} />
-                  <span>Dedicated customer support</span>
+                  <CheckCircle className="text-primary" size={24} />
+                  <span>Dedicated partner support</span>
                 </div>
               </div>
             </motion.div>
@@ -199,7 +180,7 @@ export function HomePage() {
               viewport={{ once: true }}
             >
               <img
-                src="https://placehold.co/600x400/1a1a1a/gold?text=About+Nishyash"
+                src="https://placehold.co/600x400/1b4332/white?text=Sakshi+Enterprise"
                 alt="About Us"
                 className="rounded-lg shadow-xl"
               />
@@ -212,42 +193,42 @@ export function HomePage() {
       <section className="py-12 md:py-20 bg-muted">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 md:mb-12">
-            <h2 className="text-3xl md:text-4xl mb-3 md:mb-4">Why Choose Nishyash</h2>
+            <h2 className="text-3xl md:text-4xl mb-3 md:mb-4">Why Choose Sakshi Enterprise</h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Your trusted partner for professional gifting solutions
+              Your trusted partner for authentic wellness and healthcare distribution
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
-                icon: <Users className="text-accent" size={32} />,
-                title: 'One-Stop Solution',
-                description: 'Complete gifting services from selection to delivery'
+                icon: <Shield className="text-primary" size={32} />,
+                title: 'Trusted Sourcing',
+                description: 'We ensure all our products meet expectations of quality and authenticity'
               },
               {
-                icon: <Star className="text-accent" size={32} />,
-                title: 'Custom Branding',
-                description: 'Personalize every gift with your brand identity'
+                icon: <Clock className="text-primary" size={32} />,
+                title: 'Reliable Supply',
+                description: 'Consistent and timely delivery to support our business partners'
               },
               {
-                icon: <Clock className="text-accent" size={32} />,
-                title: 'Timely Delivery',
-                description: 'Reliable logistics ensuring on-time delivery'
+                icon: <Star className="text-primary" size={32} />,
+                title: 'Authentic Range',
+                description: 'Focus on genuine Ayurvedic preparations and essential healthcare'
               },
               {
-                icon: <Shield className="text-accent" size={32} />,
-                title: 'Quality Assurance',
-                description: 'Premium products with strict quality control'
+                icon: <Users className="text-primary" size={32} />,
+                title: 'Customer-Focused',
+                description: 'Aiming to support businesses with products that enhance everyday health'
               },
               {
                 icon: <CheckCircle className="text-accent" size={32} />,
-                title: 'Dedicated Support',
-                description: '24/7 customer service for all your needs'
+                title: 'Quality First',
+                description: 'Maintaining consistent standards across our entire product portfolio'
               },
               {
-                icon: <ArrowRight className="text-accent" size={32} />,
-                title: 'Easy Process',
-                description: 'Simple ordering and customization workflow'
+                icon: <ArrowRight className="text-primary" size={32} />,
+                title: 'Long-term Partners',
+                description: 'We believe healthcare distribution is a long-term responsibility'
               }
             ].map((feature, index) => (
               <motion.div
@@ -281,7 +262,6 @@ export function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
             {featuredProducts.map((product, index) => (
-
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -300,11 +280,7 @@ export function HomePage() {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="mb-2 line-clamp-1">{product.name}</h3>
-                      {/* <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {product.description}
-                      </p> */}
                       <div className="flex justify-end items-center mt-auto">
-                        {/* <span className="font-bold text-accent">₹{product.price}</span> */}
                         <Button variant="outline" size="sm">
                           View Details
                         </Button>
@@ -315,20 +291,7 @@ export function HomePage() {
               </motion.div>
             ))}
           </div>
-          {/* <div className="text-center p-8 bg-accent/5 rounded-2xl border border-accent/20 max-w-3xl mx-auto">
-            <h3 className="text-2xl font-bold text-primary mb-2">Customization & Bulk Orders Available</h3>
-            <p className="text-muted-foreground mb-6">Contact us today to discuss your specific requirements and get exclusive bulk pricing.</p>
-            <div className="flex justify-center gap-4">
-              <Link to="/quote">
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">Request Quote</Button>
-              </Link>
-              <Link to="/contact">
-                <Button variant="outline">Contact Support</Button>
-              </Link>
-            </div>
-          </div> */}
           {!loading && featuredProducts.length === 0 && (
-
             <div className="text-center py-10 text-muted-foreground">
               New products coming soon!
             </div>
@@ -356,7 +319,7 @@ export function HomePage() {
               >
                 <Card className="bg-white">
                   <CardContent className="p-6">
-                    <div className="flex text-accent mb-4">
+                    <div className="flex text-primary mb-4">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star key={i} size={18} fill="currentColor" />
                       ))}
@@ -379,13 +342,13 @@ export function HomePage() {
       {/* CTA Section */}
       <section className="py-10 md:py-12 bg-gradient-to-br from-primary to-secondary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl md:text-3xl mb-4">Looking for a Reliable Corporate Gifting Partner?</h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl mb-4">Looking for a Reliable Healthcare Partner?</h2>
           <p className="text-base md:text-lg text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Let us help you create lasting impressions with our premium gifting solutions
+            Let us help you support healthier communities with our premium wellness solutions
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link to="/quote" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-4 h-auto text-base">
+              <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-slate-100 text-primary px-6 py-4 h-auto text-base">
                 Get a Quote
               </Button>
             </Link>

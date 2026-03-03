@@ -20,7 +20,13 @@ const app = express();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: process.env.DATABASE_URL
+        }
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -52,8 +58,8 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://clerk.nishyash.com"],
-            connectSrc: ["'self'", "https://*.clerk.accounts.dev", "https://clerk.nishyash.com", "https://api.cloudinary.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://clerk.sakshienterprise.com"],
+            connectSrc: ["'self'", "https://*.clerk.accounts.dev", "https://clerk.sakshienterprise.com", "https://api.cloudinary.com"],
             imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://*.clerk.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
@@ -64,8 +70,8 @@ app.use(helmet({
     crossOriginEmbedderPolicy: { policy: "credentialless" }, // Flexible for Cloudinary images
 }));
 const allowedOrigins = [
-    'https://www.nishyash.com',
-    'https://nishyash.com',
+    'http://localhost:5174',
+    'https://localhost:5173',
     FRONTEND_URL
 ];
 
@@ -100,11 +106,20 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
         if (!sessionClaims) {
             return res.status(401).json({ error: 'Invalid session' });
         }
-        const userEmail = sessionClaims.email as string;
+
+        // Fetch user to get current email address
+        const user = await clerkClient.users.getUser(sessionClaims.sub as string);
+        const userEmail = user.primaryEmailAddress?.emailAddress;
+
+        if (!userEmail) {
+            return res.status(403).json({ error: 'Forbidden: Identification required' });
+        }
+
         const adminEmails = (process.env.ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase());
 
+        // Enforce strict admin access
         if (!adminEmails.includes(userEmail.toLowerCase())) {
-            return res.status(403).json({ error: 'Forbidden' });
+            return res.status(403).json({ error: 'Forbidden: Admin access required' });
         }
         next();
     } catch (error) {
@@ -117,7 +132,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 
 // Health Check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Nishyash API is running' });
+    res.json({ status: 'ok', message: 'Sakshi Enterprise API is running' });
 });
 
 // Submit Lead (Contact Form)
@@ -154,13 +169,13 @@ app.post('/api/leads', submissionLimiter, async (req, res) => {
         sendNotificationEmail(
             `New Lead: ${sanitizedSubject}`,
             `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2 style="color: #d4af37;">New Lead Received</h2>
+                <h2 style="color: #2D6A4F;">New Lead Received</h2>
                 <p><strong>Name:</strong> ${sanitizedFirstName} ${sanitizedLastName}</p>
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Phone:</strong> ${phone}</p>
                 <p><strong>Subject:</strong> ${sanitizedSubject}</p>
                 <p><strong>Message:</strong></p>
-                <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #d4af37; white-space: pre-wrap;">
+                <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #2D6A4F; white-space: pre-wrap;">
                     ${sanitizedMessage}
                 </div>
                 <div style="margin-top: 20px;">
@@ -233,28 +248,28 @@ app.post('/api/quotes', /* requireAuth, */ submissionLimiter, async (req, res) =
         ).join('');
 
         const whatsappNumber = phone.replace(/[^\d]/g, '');
-        const whatsappLink = `https://wa.me/91${whatsappNumber}?text=${encodeURIComponent(`Hi ${sanitizedFullName}, thank you for your quote request at Nishyash. Regarding your request for ${items.length} items...`)}`;
+        const whatsappLink = `https://wa.me/91${whatsappNumber}?text=${encodeURIComponent(`Hi ${sanitizedFullName}, thank you for your quote request at Sakshi Enterprise. Regarding your request for ${items.length} items...`)}`;
 
         // Send email in background (don't await)
         sendNotificationEmail(
             `New Quote Request from ${sanitizedFullName}`,
             `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2 style="color: #d4af37;">New Quote Request</h2>
+                <h2 style="color: #2D6A4F;">New Quote Request</h2>
                 <p><strong>Customer:</strong> ${sanitizedFullName}</p>
                 <p><strong>Company:</strong> ${sanitizedCompanyName}</p>
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Phone:</strong> ${phone}</p>
-                <h3 style="color: #d4af37;">Items Requested:</h3>
+                <h3 style="color: #2D6A4F;">Items Requested:</h3>
                 <ul>
                     ${itemListHtml}
                 </ul>
                 <p><strong>Additional Notes:</strong></p>
-                <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #d4af37; white-space: pre-wrap;">
+                <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #2D6A4F; white-space: pre-wrap;">
                     ${sanitizedNotes || 'None'}
                 </div>
                 <div style="margin-top: 20px;">
                     <a href="${whatsappLink}" style="background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Chat on WhatsApp</a>
-                    <a href="mailto:${email}?subject=Quote Request Follow-up - Nishyash" style="background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-left: 10px;">Reply via Email</a>
+                    <a href="mailto:${email}?subject=Quote Request Follow-up - Sakshi Enterprise" style="background-color: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-left: 10px;">Reply via Email</a>
                 </div>
             </div>`
         ).catch(err => console.error("[Quote] Email error:", err));
@@ -349,16 +364,9 @@ app.get('/api/products', async (req, res) => {
 
 app.post('/api/admin/products', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { name, description, price, categoryId, inStock, defaultQuantity, tags } = req.body;
+        const { name, description, price, categoryId, inStock } = req.body;
         const imageUrl = req.file ? req.file.path : null;
 
-        // Parse tags if it's a string (comma separated)
-        let tagsArray: string[] = [];
-        if (typeof tags === 'string') {
-            tagsArray = tags.split(',').map(t => t.trim()).filter(t => t !== '');
-        } else if (Array.isArray(tags)) {
-            tagsArray = tags;
-        }
 
         const product = await prisma.product.create({
             data: {
@@ -366,10 +374,8 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
                 description,
                 price: Number.parseFloat(price),
                 image: imageUrl,
-                categoryId,
+                category: { connect: { id: categoryId } },
                 inStock: inStock === 'true' || inStock === true,
-                defaultQuantity: Number.parseInt(defaultQuantity) || 1,
-                tags: tagsArray
             },
         });
         res.status(201).json(product);
@@ -382,7 +388,7 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
 app.patch('/api/admin/products/:id', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, categoryId, inStock, defaultQuantity, tags } = req.body;
+        const { name, description, price, categoryId, inStock } = req.body;
 
         const updateData: any = {};
         if (name) updateData.name = name;
@@ -390,16 +396,8 @@ app.patch('/api/admin/products/:id', requireAuth, upload.single('image'), async 
         if (price) updateData.price = Number.parseFloat(price);
         if (categoryId) updateData.categoryId = categoryId;
         if (inStock !== undefined) updateData.inStock = inStock === 'true' || inStock === true;
-        if (defaultQuantity) updateData.defaultQuantity = Number.parseInt(defaultQuantity);
         if (req.file) updateData.image = req.file.path;
 
-        if (tags !== undefined) {
-            if (typeof tags === 'string') {
-                updateData.tags = tags.split(',').map(t => t.trim()).filter(t => t !== '');
-            } else if (Array.isArray(tags)) {
-                updateData.tags = tags;
-            }
-        }
 
         const product = await prisma.product.update({
             where: { id: id as string },
@@ -417,28 +415,21 @@ app.get('/api/products/:id/related', async (req, res) => {
         const { id } = req.params;
         const product = await prisma.product.findUnique({
             where: { id: id as string },
-            select: { categoryId: true, tags: true }
+            select: { categoryId: true }
         });
-
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        // Smarter related logic: Same category OR overlap in tags
-        const related = await prisma.product.findMany({
+        const relatedProducts = await prisma.product.findMany({
             where: {
-                id: { not: id as string },
-                OR: [
-                    { categoryId: product.categoryId },
-                    { tags: { hasSome: product.tags } }
-                ]
+                categoryId: product.categoryId,
+                NOT: { id: id as string },
             },
-            include: { category: true },
             take: 4,
-            orderBy: { createdAt: 'desc' }
         });
 
-        res.json(related);
+        res.json(relatedProducts);
     } catch (error) {
         console.error('Fetch related products error:', error);
         res.status(500).json({ error: 'Failed to fetch related products' });
@@ -455,7 +446,7 @@ app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
                 // Format: https://res.cloudinary.com/cloud_name/image/upload/v1234567/folder/public_id.jpg
                 const parts = product.image.split('/');
                 const filenameWithExtension = parts[parts.length - 1];
-                const publicId = `nishyash_products/${filenameWithExtension.split('.')[0]}`;
+                const publicId = `sakshi_products/${filenameWithExtension.split('.')[0]}`;
                 await cloudinary.uploader.destroy(publicId);
             } else {
                 // Legacy local file deletion
@@ -524,6 +515,12 @@ app.get('/api/search', async (req, res) => {
         console.error('Search error:', error);
         res.status(500).json({ error: 'Failed to perform search' });
     }
+});
+
+// Global Error Handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error('SERVER ERROR:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
 app.listen(PORT, () => {

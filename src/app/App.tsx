@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ChatBot } from './components/ChatBot';
@@ -12,49 +13,45 @@ import { ContactPage } from './pages/ContactPage';
 import { QuoteProvider } from './context/QuoteContext';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { Toaster } from './components/ui/sonner';
+import { toast } from 'sonner';
 
 import { ProductsPage } from './pages/ProductsPage';
 import { LandingPage } from './pages/LandingPage';
 import AdminPage from './pages/AdminPage';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 
 
 const GatewayGuard = () => {
-  const { user, isLoaded: isUserLoaded } = useUser();
-  const { isLoaded: isAuthLoaded } = useAuth();
+  // Bypassed for testing purposes as per user request
+  return <Outlet />;
+};
 
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
-  const adminEmails = adminEmail.split(',').map(e => e.trim().toLowerCase());
-  const isAdmin = !!user && adminEmails.includes(user.primaryEmailAddress?.emailAddress?.toLowerCase() || '');
+const AdminGuard = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoaded } = useUser();
+  const navigate = useNavigate();
 
-  const isUnlocked = (() => {
-    const unlockTime = localStorage.getItem('nishyash_gateway_unlock');
-    if (!unlockTime) return false;
+  const adminEmailStr = import.meta.env.VITE_ADMIN_EMAIL || '';
+  const adminEmails = adminEmailStr
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(e => e.length > 0);
 
-    const now = Date.now();
-    const twentyFourHours = 24 * 60 * 60 * 1000;
+  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const isAdmin = !!userEmail && adminEmails.includes(userEmail);
 
-    if (now - Number.parseInt(unlockTime) > twentyFourHours) {
-      localStorage.removeItem('nishyash_gateway_unlock');
-      return false;
+  useEffect(() => {
+    if (isLoaded && !isAdmin) {
+      toast.error("Forbidden: Admin access required.");
     }
-    return true;
-  })();
+  }, [isLoaded, isAdmin]);
 
-  if (!isUserLoaded || !isAuthLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+  if (!isLoaded) return null;
+
+  if (!isAdmin) {
+    return <Navigate to="/home" replace />;
   }
 
-  // Allow admin bypass or session-unlocked users, otherwise redirect to landing page
-  if (isAdmin || isUnlocked) {
-    return <Outlet />;
-  }
-
-  return <Navigate to="/" replace />;
+  return <>{children}</>;
 };
 
 export default function App() {
@@ -80,7 +77,7 @@ export default function App() {
                     <Route path="/products/:productId" element={<ProductPage />} />
                     <Route path="/quote" element={<QuotePage />} />
                     <Route path="/contact" element={<ContactPage />} />
-                    <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
                 </main>

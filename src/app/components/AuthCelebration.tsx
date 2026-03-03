@@ -29,13 +29,13 @@ export function AuthCelebration() {
                     ...defaults,
                     particleCount,
                     origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                    colors: ['#d4af37', '#ffffff', '#aa8a2e'] // Gold and White
+                    colors: ['#1B4332', '#ffffff', '#40916C'] // Medical Green and White
                 });
                 confetti({
                     ...defaults,
                     particleCount,
                     origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                    colors: ['#d4af37', '#ffffff', '#aa8a2e']
+                    colors: ['#1B4332', '#ffffff', '#40916C']
                 });
             }, 250);
 

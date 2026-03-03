@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -11,11 +11,12 @@ cloudinary.config({
 
 export const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        // @ts-ignore
-        folder: 'nishyash_products',
-        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-        transformation: [{ width: 1000, height: 1000, crop: 'limit' }],
+    params: async (req, file) => {
+        return {
+            folder: 'sakshi_products',
+            allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+            transformation: [{ width: 1000, height: 1000, crop: 'limit' }],
+        };
     },
 });
 

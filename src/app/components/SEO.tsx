@@ -8,7 +8,7 @@ interface SEOProps {
 
 export function Seo({ title, description, keywords }: SEOProps) {
     useEffect(() => {
-        const baseTitle = 'Nishyash - Premium Corporate & Personalised Gifting';
+        const baseTitle = 'Sakshi Enterprise - Authentic Ayurvedic & Healthcare Wellness';
         document.title = `${title} | ${baseTitle}`;
 
         if (description) {

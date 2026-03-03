@@ -1,25 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 
-interface Product {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    image: string;
-    inStock: boolean;
-    categoryId: string;
-}
-
-interface Category {
-    id: string;
-    name: string;
-    products?: Product[];
-}
+import { Category, Product } from '../types';
+import { ProductCard } from '../components/ProductCard';
+import { Button } from '../components/ui/button';
 
 export function ProductsPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -50,16 +35,16 @@ export function ProductsPage() {
     }, []);
 
     if (loading) {
-        return <div className="pt-32 pb-20 text-center text-accent">Loading collection...</div>;
+        return <div className="pt-32 pb-20 text-center text-primary">Loading collection...</div>;
     }
 
     return (
-        <div className="pt-28 pb-20 min-h-screen bg-background">
+        <div className="pt-28 pb-20 min-h-screen bg-[#f0fdf4]">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-bold mb-6 text-primary">Our Complete Collection</h1>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Discover our comprehensive range of corporate and personalized gifting solutions, thoughtfully curated for every occasion.
+                        Discover our comprehensive range of authentic Ayurvedic and healthcare wellness products, thoughtfully selected for pharmacies, retailers and clinics.
                     </p>
                 </div>
 
@@ -85,37 +70,7 @@ export function ProductsPage() {
 
                                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {categoryProducts.map((product) => (
-                                        <Link key={product.id} to={`/products/${product.id}`} className="group block h-full">
-                                            <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 bg-card hover:border-primary/20">
-                                                <div className="aspect-[4/3] overflow-hidden bg-muted relative">
-                                                    <img
-                                                        src={product.image?.startsWith('/uploads') ? `${apiBaseUrl}${product.image}` : product.image || 'https://placehold.co/600x400?text=No+Image'}
-                                                        alt={product.name}
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                    />
-                                                    {/* {!product.inStock && (
-                                                        <Badge className="absolute top-3 right-3 bg-red-500 text-white backdrop-blur-sm shadow-sm">
-                                                            Out of Stock
-                                                        </Badge>
-                                                    )} */}
-                                                </div>
-                                                <CardContent className="p-5">
-                                                    <h3 className="font-semibold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
-                                                        {product.name}
-                                                    </h3>
-                                                    {/* <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
-                                                        {product.description}
-                                                    </p> */}
-                                                    <div className="flex justify-end items-center mt-auto">
-                                                        {/* <span className="font-bold text-accent">₹{product.price}</span> */}
-                                                        <Button variant="ghost" size="sm" className="group/btn hover:bg-primary hover:text-primary-foreground">
-                                                            View Details
-                                                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                                        </Button>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        </Link>
+                                        <ProductCard key={product.id} product={product} />
                                     ))}
                                 </div>
                                 <div className="mt-8 text-center p-6 bg-muted/30 rounded-lg border border-border/50">

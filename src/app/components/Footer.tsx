@@ -9,16 +9,16 @@ export function Footer() {
           {/* Company Description */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                <span className="text-accent-foreground">NC</span>
+              <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                <span className="text-primary font-bold">SE</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-lg">Nishyash</span>
-                <span className="text-xs">Corporation</span>
+                <span className="text-lg font-script text-white">Sakshi</span>
+                <span className="text-xs tracking-widest text-white/80">ENTERPRISE</span>
               </div>
             </div>
             <p className="text-sm text-primary-foreground/80">
-              Your trusted partner for corporate and personalised gifting solutions. We deliver quality, customization, and excellence.
+              Your trusted supplier of Ayurvedic and healthcare   products committed to promoting quality, reliability, and customer satisfaction.
             </p>
           </div>
 
@@ -54,23 +54,23 @@ export function Footer() {
             <h3 className="mb-4">Categories</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/categories/corporate" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  Corporate Gifting
+                <Link to="/categories/ayurvedic" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                  Ayurvedic Range
                 </Link>
               </li>
               <li>
-                <Link to="/categories/personalized" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  Personalised Gifts
+                <Link to="/categories/healthcare" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                  Healthcare Essentials
                 </Link>
               </li>
               <li>
-                <Link to="/categories/hampers" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  Gift Hampers
+                <Link to="/categories/immunity" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                  Immunity Boosters
                 </Link>
               </li>
               <li>
-                <Link to="/categories/eco" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                  Eco-Friendly Gifts
+                <Link to="/categories/herbal" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                  Herbal Supplements
                 </Link>
               </li>
             </ul>
@@ -82,21 +82,20 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start space-x-2">
                 <Mail size={16} className="mt-1 flex-shrink-0" />
-                <span className="text-primary-foreground/80">{(import.meta.env.VITE_ADMIN_EMAIL || 'info@nishyash.com').split(',')[0].trim()}</span>
+                <span className="text-primary-foreground/80">info@sakshienterprise.com</span>
               </li>
               <li className="flex items-start space-x-2">
                 <Phone size={16} className="mt-1 flex-shrink-0" />
                 <span className="text-primary-foreground/80">
                   +91 93263 47507<br />
-                  +91 836 916 2195
+                  +91 89282 23528
                 </span>
               </li>
               <li className="flex items-start space-x-2">
                 <MapPin size={16} className="mt-1 flex-shrink-0" />
                 <span className="text-primary-foreground/80">
-                  Business Center, Flat no. 28,<br />
-                  Humlog Society, Kandivali West,<br />
-                  Mumbai, Maharashtra 400067, India
+                  Business Center, Andheri East,<br />
+                  Mumbai, Maharashtra 400069
                 </span>
               </li>
             </ul>
@@ -105,7 +104,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-sm text-primary-foreground/60">
-          <p>&copy; {new Date().getFullYear()} Nishyash Corporation. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Sakshi Enterprise. All rights reserved.</p>
         </div>
       </div>
     </footer>

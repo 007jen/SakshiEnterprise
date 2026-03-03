@@ -2,22 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Seo } from '../components/SEO';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
-import { CheckCircle, MessageCircle, ShoppingBag, Plus, Minus, Loader2 } from 'lucide-react';
+import { CheckCircle, MessageCircle, Loader2, ArrowRight } from 'lucide-react';
 import { useQuote } from '../context/QuoteContext';
 import { motion } from 'motion/react';
-
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  inStock: boolean;
-  categoryId: string;
-  tags?: string[];
-}
+import { Product } from '../types';
+import { formatProductImageUrl, getWhatsAppLink } from '../utils/helpers';
+import { ProductCard } from '../components/ProductCard';
 
 export function ProductPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -63,7 +55,7 @@ export function ProductPage() {
   if (loading) {
     return (
       <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
-        <Loader2 className="animate-spin text-accent" size={48} />
+        <Loader2 className="animate-spin text-primary" size={48} />
       </div>
     );
   }
@@ -82,37 +74,29 @@ export function ProductPage() {
   }
 
   const customizationOptions = [
-    'Logo Printing',
-    'Custom Colors',
-    'Personalized Packaging',
-    'Custom Messages',
-    'Bulk Discounts Available'
+    'Quality Assurance',
+    'Ethical Sourcing',
+    'Reliable Supply Chain',
+    'Bulk Packaging Options',
+    'Specialized Distribution'
   ];
 
   const useCases = [
-    'Corporate Events',
-    'Client Appreciation',
-    'Employee Recognition',
-    'Festive Celebrations',
-    'Product Launches',
-    'Trade Shows & Exhibitions'
+    'Pharmacies & Retailers',
+    'Hospitals & Clinics',
+    'Wellness Centers',
+    'Ayurvedic Practitioners',
+    'Health Stores',
+    'Institutional Supplies'
   ];
 
   const handleWhatsApp = () => {
     const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
-    // Strip any non-digit characters (like +, -, spaces)
-    const phoneNumber = rawNumber.replace(/\D/g, '');
+    const message = `Hi, I'm interested in ${product.name}. Can you provide more information?`;
+    const whatsappLink = getWhatsAppLink(rawNumber, message);
 
-
-    // Ensure we have a valid number and it starts with 91 for India if not already present
-    const formattedNumber = phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`;
-
-    const message = encodeURIComponent(
-      `Hi, I'm interested in ${product.name}. Can you provide more information?`
-    );
-
-    if (formattedNumber.length > 2) {
-      window.open(`https://wa.me/${formattedNumber}?text=${message}`, '_blank');
+    if (whatsappLink) {
+      window.open(whatsappLink, '_blank');
     } else {
       console.warn('WhatsApp number not configured correctly in .env');
     }
@@ -134,7 +118,7 @@ export function ProductPage() {
             transition={{ duration: 0.6 }}
           >
             <img
-              src={product.image?.startsWith('/uploads') ? `${apiBaseUrl}${product.image}` : product.image || 'https://placehold.co/600x400?text=No+Image'}
+              src={formatProductImageUrl(product.image)}
               alt={product.name}
               className="w-full rounded-lg shadow-xl"
             />
@@ -146,22 +130,23 @@ export function ProductPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="mb-4 sm:mb-6">
+            <div className="mb-4">
+              <Badge className={`${product.inStock ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                {product.inStock ? 'In Stock' : 'Out of Stock'}
+              </Badge>
             </div>
-
             <h1 className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4">{product.name}</h1>
+            <p className="text-2xl font-bold text-accent mb-4 sm:mb-6">₹{product.price}</p>
             <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">{product.description}</p>
 
-
-
             {/* Customization Options */}
-            <Card className="mb-6 sm:mb-8">
+            <Card className="mb-6 sm:mb-8 text-primary">
               <CardContent className="p-4 sm:p-6">
-                <h3 className="mb-3 sm:mb-4 text-lg sm:text-xl font-semibold">Customization Options</h3>
+                <h3 className="mb-3 sm:mb-4 text-lg sm:text-xl font-semibold">Key Highlights</h3>
                 <div className="space-y-2">
                   {customizationOptions.map((option) => (
                     <div key={option} className="flex items-center space-x-2">
-                      <CheckCircle className="text-accent" size={18} />
+                      <CheckCircle className="text-primary" size={18} />
                       <span className="text-xs sm:text-sm">{option}</span>
                     </div>
                   ))}
@@ -169,61 +154,23 @@ export function ProductPage() {
               </CardContent>
             </Card>
 
-            {/* Quantity and CTA Buttons */}
+            {/* CTA Buttons */}
             <div className="flex flex-col gap-6 mb-8">
-              {/* <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">Quantity:</span>
-                <div className="flex items-center border rounded-md">
-                  <button
-                    className="p-2 hover:bg-muted"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <input
-                    type="number"
-                    className="w-20 text-center border-none focus:ring-0 p-1"
-                    value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                    min="1"
-                  />
-                  <button
-                    className="p-2 hover:bg-muted"
-                    onClick={() => setQuantity(quantity + 1)}
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-              </div> */}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* <Button
+              <div className="flex justify-start">
+                <Button
                   size="lg"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground w-full"
-                  onClick={() => addToQuote(product, quantity)}
+                  variant="outline"
+                  className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-bold h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg border-none transition-all active:scale-95"
+                  onClick={handleWhatsApp}
                 >
-                  <ShoppingBag className="mr-2" size={20} />
-                  Add to Quote
-                </Button> */}
-
-                <div className="flex justify-start">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-bold h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg border-none transition-all active:scale-95"
-                    onClick={handleWhatsApp}
-                  >
-                    <MessageCircle className="mr-2" size={20} />
-                    WhatsApp Us
-                  </Button>
-                </div>
+                  <MessageCircle className="mr-2" size={20} />
+                  WhatsApp Us
+                </Button>
               </div>
             </div>
-            <p className="text-xl font-bold text-accent mb-8">
-              Customization & bulk orders available. Contact us today!
+            <p className="text-xl font-bold text-primary mb-8">
+              Bulk orders and healthcare partnerships available. Contact us today!
             </p>
-
-            {/* Additional Info removed as requested */}
           </motion.div>
         </div>
 
@@ -242,9 +189,9 @@ export function ProductPage() {
                 {useCases.map((useCase) => (
                   <div
                     key={useCase}
-                    className="flex items-center space-x-2 p-3 bg-muted rounded-lg"
+                    className="flex items-center space-x-2 p-3 bg-primary/5 rounded-lg"
                   >
-                    <CheckCircle className="text-accent flex-shrink-0" size={20} />
+                    <CheckCircle className="text-primary flex-shrink-0" size={20} />
                     <span className="text-sm">{useCase}</span>
                   </div>
                 ))}
@@ -263,29 +210,7 @@ export function ProductPage() {
           <h2 className="text-3xl mb-8">Related Products</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((relatedProduct) => (
-              <Link key={relatedProduct.id} to={`/products/${relatedProduct.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 overflow-hidden bg-muted">
-                    <img
-                      src={relatedProduct.image?.startsWith('/uploads') ? `${apiBaseUrl}${relatedProduct.image}` : relatedProduct.image || 'https://placehold.co/600x400?text=No+Image'}
-                      alt={relatedProduct.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="mb-2 line-clamp-1">{relatedProduct.name}</h3>
-                    {/* <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {relatedProduct.description}
-                    </p> */}
-                    <div className="flex justify-end items-center mt-auto">
-                      {/* <span className="font-bold text-accent">₹{relatedProduct.price}</span> */}
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <ProductCard key={relatedProduct.id} product={relatedProduct} />
             ))}
           </div>
         </motion.div>

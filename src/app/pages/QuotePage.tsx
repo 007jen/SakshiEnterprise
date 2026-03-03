@@ -98,7 +98,7 @@ export function QuotePage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen pt-32 pb-20">
+      <div className="min-h-screen pt-32 pb-20 bg-[#f0fdf4]">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -116,7 +116,7 @@ export function QuotePage() {
                   Your quote request has been successfully submitted. Our team will review your requirements and get back to you within 24 hours.
                 </p>
                 <Link to="/home">
-                  <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
                     Back to Home
                   </Button>
                 </Link>
@@ -131,17 +131,17 @@ export function QuotePage() {
   // --- EMPTY STATE ---
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
+      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center bg-[#f0fdf4]">
         <div className="text-center">
           <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="text-muted-foreground" size={48} />
           </div>
           <h1 className="text-3xl mb-4">Your Quote Cart is Empty</h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            It looks like you haven't added any products to your quote request yet. Browse our collections to find the perfect gifts.
+            It looks like you haven't added any products to your quote request yet. Browse our collections to find the perfect wellness products.
           </p>
           <Link to="/products">
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
               Explore Products <ArrowRight className="ml-2" size={18} />
             </Button>
           </Link>
@@ -152,7 +152,7 @@ export function QuotePage() {
 
   // --- POPULATED CART STATE ---
   return (
-    <div className="min-h-screen pt-32 pb-20">
+    <div className="min-h-screen pt-32 pb-20 bg-[#f0fdf4]">
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <h1 className="text-4xl mb-3">Finalize Your Quote Request</h1>
@@ -229,9 +229,9 @@ export function QuotePage() {
 function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, formData: any, isSubmitting: boolean, handleSubmit: any, handleChange: any) {
   if (!isLoaded) {
     return (
-      <Card className="p-8 text-center bg-black/50 border-accent/20">
+      <Card className="p-8 text-center bg-primary/5 border-primary/20">
         <div className="flex justify-center mb-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-accent"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
         </div>
         <p className="text-muted-foreground">Verifying session...</p>
       </Card>
@@ -240,20 +240,20 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
 
   if (!isSignedIn) {
     return (
-      <Card className="border-accent/30 bg-black/40 backdrop-blur-sm overflow-hidden">
+      <Card className="border-primary/30 bg-white/40 backdrop-blur-sm overflow-hidden">
         <CardHeader className="text-center pt-10 pb-6">
-          <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-accent/20">
-            <Lock className="text-accent" size={32} />
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/20">
+            <Lock className="text-primary" size={32} />
           </div>
-          <CardTitle className="text-2xl text-accent">Sign In Required</CardTitle>
+          <CardTitle className="text-2xl text-primary">Sign In Required</CardTitle>
           <CardDescription className="text-base mt-2">
-            To maintain order history and secure your quote, please sign in to your Nishyash account.
+            To maintain order history and secure your quote, please sign in to your Sakshi Enterprise account.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-10 pb-10 flex flex-col items-center">
           <SignInButton mode="modal">
-            <Button size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold py-6 text-lg">
-              Sign In to Nishyash
+            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-6 text-lg">
+              Sign In to Sakshi Enterprise
             </Button>
           </SignInButton>
           <p className="mt-6 text-sm text-muted-foreground">
@@ -265,9 +265,9 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
   }
 
   return (
-    <Card className="sticky top-24 border-accent/20">
+    <Card className="sticky top-24 border-primary/20">
       <CardHeader>
-        <CardTitle className="text-accent">Contact Details</CardTitle>
+        <CardTitle className="text-primary">Contact Details</CardTitle>
         <CardDescription>
           Where should we send the quotation, {user?.firstName}?
         </CardDescription>
@@ -313,7 +313,7 @@ function renderFormColumn(isLoaded: boolean, isSignedIn: boolean, user: any, for
               <Input
                 id="phone"
                 type="tel"
-                placeholder="Ex: 9082035278"
+                placeholder="Ex: 9326347507"
                 required
                 maxLength={10}
                 pattern="[0-9]{10}"

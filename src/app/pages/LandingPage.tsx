@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import {
-    ArrowRight, Star, Briefcase, Heart, Award, Shield, CheckCircle, Gift
+    ArrowRight, Star, Heart, Award, Shield, CheckCircle, Pill, BriefcaseMedical
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Footer } from "../components/Footer";
@@ -13,7 +13,7 @@ import Ganesh from "../../assets/Ganesh.png";
 
 // Component for falling gifts effect
 const FallingGifts = () => {
-    const colors = ['#f94c4cff', '#3992ffff', '#67fc7eff', '#f6ff00ff', '#222222ff'];
+    const colors = ['#2d6a4f', '#40916c', '#52b788', '#74c69d', '#b7e4c7'];
 
     const giftData = useMemo(() => {
         return Array.from({ length: 25 }).map((_, i) => ({
@@ -51,7 +51,9 @@ const FallingGifts = () => {
                     className="absolute"
                     style={{ color: gift.color }}
                 >
-                    <Gift size={gift.size} strokeWidth={1} />
+                    {/* <Leaf size={gift.size} strokeWidth={1} /> */}
+                    <Pill size={gift.size} strokeWidth={1} />
+                    <BriefcaseMedical size={gift.size} strokeWidth={1} />
                 </motion.div>
             ))}
         </div>
@@ -68,25 +70,25 @@ export function LandingPage() {
     const isAdmin = !!user && adminEmails.includes(user.primaryEmailAddress?.emailAddress?.toLowerCase() || '');
 
     useEffect(() => {
-        const unlockTime = localStorage.getItem('nishyash_gateway_unlock');
+        const unlockTime = localStorage.getItem('sakshi_gateway_unlock');
         if (unlockTime) {
             const now = Date.now();
             const twentyFourHours = 24 * 60 * 60 * 1000;
             if (now - Number.parseInt(unlockTime) <= twentyFourHours) {
                 navigate('/home');
             } else {
-                localStorage.removeItem('nishyash_gateway_unlock');
+                localStorage.removeItem('sakshi_gateway_unlock');
             }
         }
     }, [navigate]);
 
     const handleBeginJourney = () => {
         // Always trigger the chatbot
-        globalThis.dispatchEvent(new CustomEvent('open-nishyash-chat'));
+        globalThis.dispatchEvent(new CustomEvent('open-sakshi-chat'));
     };
 
     return (
-        <div className="min-h-screen bg-[#fff9f9] text-foreground selection:bg-accent selection:text-accent-foreground relative">
+        <div className="min-h-screen bg-white text-foreground selection:bg-primary/20 selection:text-primary relative">
 
             {/* Falling Gifts Layer */}
             <FallingGifts />
@@ -95,7 +97,7 @@ export function LandingPage() {
             {isAdmin && (
                 <div className="absolute top-4 right-4 z-50">
                     <Link to="/admin">
-                        <Button variant="outline" size="sm" className="bg-white/5 backdrop-blur-md hover:bg-white/10 text-accent/60 hover:text-accent gap-2 border border-accent/10 transition-all rounded-full px-4 text-xs">
+                        <Button variant="outline" size="sm" className="bg-white/5 backdrop-blur-md hover:bg-white/10 text-primary/60 hover:text-primary gap-2 border border-primary/10 transition-all rounded-full px-4 text-xs">
                             <Shield size={12} />
                             Admin Access
                         </Button>
@@ -104,7 +106,7 @@ export function LandingPage() {
             )}
 
             {/* --- INTRODUCTION SECTION --- */}
-            <section className="relative pt-8 md:pt-12 pb-24 md:pb-32 bg-[#f2ebd9] text-center overflow-hidden">
+            <section className="relative pt-8 md:pt-12 pb-24 md:pb-32 bg-secondary/10 text-center overflow-hidden">
                 <div className="container mx-auto px-4 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -119,18 +121,18 @@ export function LandingPage() {
                             transition={{ duration: 1.5, ease: "easeOut" }}
                             className="relative mb-4 group"
                         >
-                            <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full scale-110 group-hover:bg-accent/30 transition-all duration-1000" />
+                            <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full scale-110 group-hover:bg-primary/20 transition-all duration-1000" />
                             <img
                                 src={Ganesh}
-                                alt="Lord Ganesha"
-                                className="relative w-24 md:w-32 lg:w-40  drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                                alt="Sakshi Enterprise"
+                                className="relative w-24 md:w-32 lg:w-40 grayscale-[0.5] hover:grayscale-0 transition-all"
                             />
                         </motion.div>
 
                         <motion.h1
-                            className="text-7xl sm:text-8xl md:text-9xl lg:text-[12rem] mb-4 font-script text-accent py-4"
+                            className="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] mb-4 font-bold text-primary py-4"
                         >
-                            Nishyash
+                            Sakshi Enterprise
                         </motion.h1>
 
                         <motion.div
@@ -138,7 +140,7 @@ export function LandingPage() {
                         >
                             <div className="h-[1px] w-8 sm:w-16 bg-primary/20" />
                             <span className="text-primary tracking-[0.2em] sm:tracking-[0.4em] text-xl sm:text-2lg font-medium uppercase">
-                                Soulful Creations & Bespoke Excellence
+                                Authentic Ayurvedic & Healthcare
                             </span>
                             <div className="h-[1px] w-8 sm:w-16 bg-primary/20" />
                         </motion.div>
@@ -146,17 +148,19 @@ export function LandingPage() {
                         <motion.p
                             className="text-base sm:text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-light px-4"
                         >
-                            Where craftsmanship meets emotion. We curate the extraordinary for those who appreciate the finer things in life.
+                            Committed to promoting quality, reliability, and customer satisfaction through genuine Ayurvedic preparations and essential healthcare products.
                         </motion.p>
 
-                        <motion.div>
-                            <Button
-                                onClick={handleBeginJourney}
-                                size="lg"
-                                className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 sm:px-12 py-6 sm:py-8 text-lg sm:text-xl rounded-full transition-all duration-500 hover:scale-105 shadow-xl group"
-                            >
-                                Begin the Journey <ArrowRight className="ml-2 sm:ml-3 group-hover:translate-x-2 transition-transform" />
-                            </Button>
+                        <motion.div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Link to="/home">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="border-primary text-primary hover:bg-primary/5 px-8 sm:px-10 py-6 sm:py-7 text-lg rounded-full transition-all duration-500 hover:scale-105 w-full sm:w-auto"
+                                >
+                                    Enter Site <ArrowRight className="ml-2" />
+                                </Button>
+                            </Link>
                         </motion.div>
                     </motion.div>
                 </div>
@@ -168,7 +172,7 @@ export function LandingPage() {
             </section>
 
             {/* --- ABOUT SECTION --- */}
-            <section className="py-32 relative overflow-hidden bg-[#fdf2f2]">
+            <section className="py-32 relative overflow-hidden bg-white">
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-20 items-center">
                         <motion.div
@@ -177,21 +181,21 @@ export function LandingPage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                         >
-                            <h2 className="text-primary tracking-widest uppercase text-sm mb-4 font-semibold">Our Essence</h2>
+                            <h2 className="text-primary tracking-widest uppercase text-sm mb-4 font-semibold">About Us</h2>
                             <h3 className="text-4xl md:text-6xl font-light mb-8 leading-tight text-primary">
-                                Crafting Moments into <span className="text-accent italic font-script capitalize text-5xl md:text-7xl">Memories</span>
+                                Promoting Quality & <span className="text-primary italic font-bold capitalize text-5xl md:text-7xl">Wellness</span>
                             </h3>
                             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                                At Nishyash, we believe a gift is more than just an object—it's a story, a connection, and a testament to a relationship. Born from a passion for exquisite design and soulful creation, we've dedicated ourselves to the art of premium gifting.
+                                Sakshi Enterprise is a trusted supplier of Ayurvedic and healthcare wellness products. We specialize in authentic Ayurvedic preparations and selected healthcare essentials for pharmacies, retailers, and distributors.
                             </p>
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-2">
-                                    <h4 className="text-primary text-2xl font-script tracking-wide italic">Exclusivity</h4>
-                                    <p className="text-xs text-muted-foreground uppercase tracking-tighter max-w-[150px]">Hand-picked collections you won't find elsewhere.</p>
+                                    <h4 className="text-primary text-2xl font-script tracking-wide italic">Authenticity</h4>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-tighter max-w-[150px]">Genuine Ayurvedic and wellness products you can trust.</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <h4 className="text-primary text-2xl font-script tracking-wide italic">Emotion</h4>
-                                    <p className="text-xs text-muted-foreground uppercase tracking-tighter max-w-[150px]">Personalized touches that speak directly to the heart.</p>
+                                    <h4 className="text-primary text-2xl font-script tracking-wide italic">Reliability</h4>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-tighter max-w-[150px]">Consistent quality and dependable supply for our partners.</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -202,11 +206,11 @@ export function LandingPage() {
                             transition={{ duration: 1 }}
                             className="relative group"
                         >
-                            <div className="absolute -inset-4 bg-accent/10 rounded-2xl blur-2xl group-hover:bg-accent/20 transition-all duration-700" />
+                            <div className="absolute -inset-4 bg-primary/5 rounded-2xl blur-2xl group-hover:bg-primary/10 transition-all duration-700" />
                             <img
                                 src={GoldenImage}
-                                alt="Luxury Craftsmanship"
-                                className="relative rounded-2xl shadow-2xl border border-border transition-all duration-700"
+                                alt="Healthcare Excellence"
+                                className="relative rounded-2xl shadow-2xl border border-border transition-all duration-700 grayscale-[0.3] hover:grayscale-0"
                             />
                         </motion.div>
                     </div>
@@ -223,52 +227,52 @@ export function LandingPage() {
                             viewport={{ once: true }}
                             className="text-4xl md:text-5xl font-light mb-4 text-primary"
                         >
-                            Two Worlds, One <span className="text-accent italic font-script capitalize">Excellence</span>
+                            Healthcare Essentials & <span className="text-primary italic font-bold capitalize">Ayurvedic Range</span>
                         </motion.h2>
-                        <p className="text-muted-foreground tracking-[0.2em] uppercase text-xs font-semibold">Tailored for Every Need</p>
+                        <p className="text-muted-foreground tracking-[0.2em] uppercase text-xs font-semibold">Expertly Sourced Wellness</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-8">
-                        {/* Corporate */}
+                        {/* Ayurvedic Range */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="group p-12 bg-white/60 border border-border hover:border-accent/40 rounded-3xl transition-all duration-500 hover:shadow-xl backdrop-blur-sm"
+                            className="group p-12 bg-slate-50 border border-border hover:border-primary/40 rounded-3xl transition-all duration-500 hover:shadow-xl backdrop-blur-sm"
                         >
-                            <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-accent/20 transition-colors">
-                                <Briefcase className="text-accent" size={32} />
+                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary/20 transition-colors">
+                                <Pill className="text-primary" size={32} />
                             </div>
-                            <h3 className="text-3xl mb-6 font-light text-primary">Corporate Gifting</h3>
+                            <h3 className="text-3xl mb-6 font-light text-primary">Ayurvedic Range</h3>
                             <p className="text-muted-foreground mb-8 leading-relaxed">
-                                Elevate your brand presence with sophisticated employee kits, conference gifts, and client appreciations that reflect your professional standard.
+                                Traditional Ayurvedic preparations including Kadhas, herbal decoctions, and immunity booster formulations designed for preventive healthcare.
                             </p>
                             <ul className="space-y-4 text-sm text-muted-foreground">
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Bulk Order Discounts</li>
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Custom Company Branding</li>
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Direct-to-Recipient Delivery</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> Authentic Herbal Decoctions</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> Natural Immunity Boosters</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> Therapeutic Wellness Supplements</li>
                             </ul>
                         </motion.div>
 
-                        {/* Personal */}
+                        {/* Healthcare Essentials */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="group p-12 bg-white/60 border border-border hover:border-accent/40 rounded-3xl transition-all duration-500 hover:shadow-xl backdrop-blur-sm"
+                            className="group p-12 bg-slate-50 border border-border hover:border-primary/40 rounded-3xl transition-all duration-500 hover:shadow-xl backdrop-blur-sm"
                         >
-                            <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-accent/20 transition-colors">
-                                <Heart className="text-accent" size={32} />
+                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary/20 transition-colors">
+                                <Heart className="text-primary" size={32} />
                             </div>
-                            <h3 className="text-3xl mb-6 font-light text-primary">Personalised Creations</h3>
+                            <h3 className="text-3xl mb-6 font-light text-primary">Healthcare Essentials</h3>
                             <p className="text-muted-foreground mb-8 leading-relaxed">
-                                Celebrate life's milestone with unique, custom-engraved gifts and curated hampers that tell your loved ones exactly how much they mean to you.
+                                Selected surgical items, OTC wellness products, and preventive healthcare essentials to support businesses and communities.
                             </p>
                             <ul className="space-y-4 text-sm text-muted-foreground">
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Individual Customization</li>
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Gift Wrap & Messaging</li>
-                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-accent" /> Ready-to-Gift Packaging</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> Selected Surgical Items</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> OTC Wellness Products</li>
+                                <li className="flex items-center gap-3"><CheckCircle size={14} className="text-primary" /> Pain Relief Balms & Oils</li>
                             </ul>
                         </motion.div>
                     </div>
@@ -276,7 +280,7 @@ export function LandingPage() {
             </section>
 
             {/* --- FEATURES GRID --- */}
-            <section className="py-32 bg-[#fff2f2]">
+            <section className="py-32 bg-secondary/5">
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
                         {[
@@ -293,7 +297,7 @@ export function LandingPage() {
                                 transition={{ delay: i * 0.1 }}
                                 className="text-center group"
                             >
-                                <div className="mb-6 mx-auto w-12 h-12 flex items-center justify-center text-primary group-hover:text-accent transition-colors">
+                                <div className="mb-6 mx-auto w-12 h-12 flex items-center justify-center text-primary group-hover:text-primary transition-colors">
                                     <f.icon size={32} strokeWidth={1.5} />
                                 </div>
                                 <h4 className="text-lg mb-3 font-semibold text-primary">{f.title}</h4>
@@ -320,15 +324,15 @@ export function LandingPage() {
                         transition={{ duration: 0.8 }}
                     >
                         <h2 className="text-5xl md:text-7xl mb-8 font-light tracking-tight">
-                            Ready to Craft Your <br />
-                            <span className="text-accent italic font-script capitalize">Masterpiece?</span>
+                            Your Partner in <br />
+                            <span className="text-white italic font-bold capitalize">Wellness Excellence</span>
                         </h2>
                         <Button
                             onClick={handleBeginJourney}
                             size="lg"
-                            className="bg-accent hover:bg-accent/90 text-accent-foreground px-16 py-8 text-2xl rounded-full transition-all duration-500 hover:scale-105 shadow-2xl"
+                            className="bg-white hover:bg-slate-100 text-primary px-16 py-8 text-2xl rounded-full transition-all duration-500 hover:scale-105 shadow-2xl"
                         >
-                            Enter the Studio
+                            Get Started
                         </Button>
                     </motion.div>
                 </div>
