@@ -140,7 +140,7 @@ export function LandingPage() {
                         >
                             <div className="h-[1px] w-8 sm:w-16 bg-primary/20" />
                             <span className="text-primary tracking-[0.2em] sm:tracking-[0.4em] text-xl sm:text-2lg font-medium uppercase">
-                                Authentic Ayurvedic & Healthcare
+                                Ayurvedic & Healthcare
                             </span>
                             <div className="h-[1px] w-8 sm:w-16 bg-primary/20" />
                         </motion.div>
