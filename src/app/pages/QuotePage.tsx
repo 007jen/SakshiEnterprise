@@ -198,6 +198,11 @@ export function QuotePage() {
                   <span>Order Total</span>
                   <span className="text-2xl text-accent">₹{orderTotal}</span>
                 </div>
+                {orderTotal < 1000 && (
+                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
+                    <span className="font-bold">Minimum Order Required:</span> ₹1000. Add more items to proceed.
+                  </div>
+                )}
                 <p className="text-sm text-muted-foreground mt-2">Shipping and taxes calculated at checkout if applicable.</p>
               </CardContent>
             </Card>
@@ -218,7 +223,8 @@ export function QuotePage() {
               handleSubmit,
               handleChange,
               sameAsBilling,
-              setSameAsBilling
+              setSameAsBilling,
+              orderTotal
             })}
           </motion.div>
         </div>
@@ -237,6 +243,7 @@ interface FormColumnProps {
   handleChange: (field: string, value: string) => void;
   sameAsBilling: boolean;
   setSameAsBilling: (val: boolean) => void;
+  orderTotal: number;
 }
 
 function renderFormColumn({
@@ -248,7 +255,8 @@ function renderFormColumn({
   handleSubmit,
   handleChange,
   sameAsBilling,
-  setSameAsBilling
+  setSameAsBilling,
+  orderTotal
 }: FormColumnProps) {
   if (!isLoaded) {
     return (
@@ -404,10 +412,10 @@ function renderFormColumn({
           <Button
             type="submit"
             size="lg"
-            disabled={isSubmitting}
-            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+            disabled={isSubmitting || orderTotal < 1000}
+            className={`w-full ${orderTotal < 1000 ? 'bg-gray-300' : 'bg-accent hover:bg-accent/90 text-accent-foreground'}`}
           >
-            {isSubmitting ? 'Processing Order...' : 'Submit Order'}
+            {isSubmitting ? 'Processing Order...' : orderTotal < 1000 ? `₹${1000 - orderTotal} More Needed` : 'Submit Order'}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">

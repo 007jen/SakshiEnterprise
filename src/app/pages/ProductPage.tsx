@@ -163,6 +163,7 @@ export function ProductPage() {
             <h1 className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4">{product.name}</h1>
             <div className="mb-4 sm:mb-6">
               <p className="text-3xl font-bold text-[#2c3333] mb-1">₹{currentPrice}</p>
+              <p className="text-xs text-muted-foreground/80 mb-2">(Incl. of all taxes)</p>
               {currentMrp && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">M.R.P.: <span className="line-through">₹{currentMrp}</span></span>
@@ -212,7 +213,8 @@ export function ProductPage() {
                           {v.size}
                         </div>
                         <div className="p-4 flex-1">
-                          <div className="text-2xl font-extrabold text-[#2c3333] mb-1">₹{v.price}</div>
+                          <div className="text-2xl font-extrabold text-[#2c3333] mb-0.5">₹{v.price}</div>
+                          <div className="text-[10px] text-muted-foreground/70 mb-1.5">(Incl. of all taxes)</div>
                           {v.mrp && (
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-muted-foreground/60 line-through">₹{v.mrp}</span>
