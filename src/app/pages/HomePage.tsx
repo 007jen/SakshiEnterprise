@@ -377,17 +377,6 @@ export function HomePage() {
                     <CardContent className="p-4">
                       <h3 className="mb-2 line-clamp-1 h-6">{product.name}</h3>
                       <div className="flex flex-col mb-4">
-                        <span className="text-xl font-bold text-accent leading-none mb-1">
-                          ₹{product.price}
-                        </span>
-                        {product.mrp && product.mrp > product.price && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground line-through">₹{product.mrp}</span>
-                            <span className="text-xs text-primary font-bold uppercase">
-                              {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% off
-                            </span>
-                          </div>
-                        )}
                       </div>
                       <div className="flex justify-end items-center">
                         <Button variant="outline" size="sm">

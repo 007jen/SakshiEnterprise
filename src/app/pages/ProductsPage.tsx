@@ -75,7 +75,7 @@ export function ProductsPage() {
                                 </div>
                                 <div className="mt-8 text-center p-6 bg-muted/30 rounded-lg border border-border/50">
                                     <p className="text-lg font-medium text-primary">
-                                        Customization & bulk orders available. Contact us today for special pricing!
+                                        For Customization & bulk orders available. Please talk to our agent in chatbox
                                     </p>
                                 </div>
                             </section>

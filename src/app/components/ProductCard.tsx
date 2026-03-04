@@ -31,20 +31,7 @@ export function ProductCard({ product }: Readonly<ProductCardProps>) {
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                         {product.description}
                     </p>
-                    <div className="flex justify-between items-end mt-auto">
-                        <div className="flex flex-col">
-                            <span className="font-bold text-accent text-xl leading-none mb-1">
-                                ₹{product.price}
-                            </span>
-                            {Boolean(product.mrp && product.mrp > product.price) && (
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] text-muted-foreground line-through">₹{product.mrp}</span>
-                                    <span className="text-[11px] text-primary font-bold uppercase">
-                                        {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% off
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+                    <div className="flex justify-end items-end mt-auto">
                         <Button variant="ghost" size="sm" className="h-9 hover:bg-primary hover:text-primary-foreground group/btn">
                             View
                             <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform ml-1" />
