@@ -128,10 +128,12 @@ export function HomePage() {
                 transition={{ duration: 0.7 }}
                 className="w-full flex justify-center relative"
               >
-                <img
+                <motion.img
                   src={slides[currentSlide].image}
                   alt={slides[currentSlide].title}
-                  className="h-auto max-h-[40vh] object-contain rounded-3xl shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500"
+                  className="h-auto max-h-[55vh] object-contain rounded-3xl shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 />
               </motion.div>
             </AnimatePresence>
