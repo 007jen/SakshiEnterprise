@@ -32,10 +32,12 @@ export function ProductCard({ product }: ProductCardProps) {
                         {product.description}
                     </p>
                     <div className="flex justify-between items-center mt-auto">
-                        <span className="font-bold text-accent">₹{product.price}</span>
+                        <span className="font-bold text-accent text-xl">
+                            {product.mrp ? `M.R.P.: ₹${product.mrp}` : `₹${product.price}`}
+                        </span>
                         <Button variant="ghost" size="sm" className="group/btn hover:bg-primary hover:text-primary-foreground">
-                            View Details
-                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                            Details
+                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform ml-1" />
                         </Button>
                     </div>
                 </CardContent>

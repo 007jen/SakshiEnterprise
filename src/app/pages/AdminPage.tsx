@@ -55,6 +55,7 @@ interface Product {
     name: string;
     description?: string;
     price: number;
+    mrp?: number;
     image?: string;
     inStock: boolean;
     categoryId: string;
@@ -88,6 +89,7 @@ export default function AdminPage() {
         name: '',
         description: '',
         price: '',
+        mrp: '',
         categoryId: '',
         inStock: true
     });
@@ -206,6 +208,7 @@ export default function AdminPage() {
             formData.append('name', productForm.name);
             formData.append('description', productForm.description);
             formData.append('price', productForm.price);
+            formData.append('mrp', productForm.mrp);
             formData.append('categoryId', productForm.categoryId);
             formData.append('inStock', String(productForm.inStock));
             if (selectedFile) {
@@ -230,6 +233,7 @@ export default function AdminPage() {
                     name: '',
                     description: '',
                     price: '',
+                    mrp: '',
                     categoryId: '',
                     inStock: true
                 });
@@ -250,6 +254,7 @@ export default function AdminPage() {
             name: product.name,
             description: product.description || '',
             price: String(product.price),
+            mrp: product.mrp ? String(product.mrp) : '',
             categoryId: product.categoryId,
             inStock: product.inStock
         });
@@ -565,7 +570,7 @@ export default function AdminPage() {
                                     onClick={() => {
                                         setIsAddingProduct(!isAddingProduct);
                                         setEditingProduct(null);
-                                        setProductForm({ name: '', description: '', price: '', categoryId: '', inStock: true });
+                                        setProductForm({ name: '', description: '', price: '', mrp: '', categoryId: '', inStock: true });
                                         setSelectedFile(null);
                                     }}
                                     className="bg-primary text-primary-foreground"
@@ -621,7 +626,7 @@ export default function AdminPage() {
 
                                             <div className="grid md:grid-cols-3 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="price">Price *</Label>
+                                                    <Label htmlFor="price">Selling Price *</Label>
                                                     <Input
                                                         id="price"
                                                         type="number"
@@ -629,6 +634,16 @@ export default function AdminPage() {
                                                         value={productForm.price}
                                                         onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
                                                         required
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="mrp">MRP</Label>
+                                                    <Input
+                                                        id="mrp"
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={productForm.mrp}
+                                                        onChange={(e) => setProductForm({ ...productForm, mrp: e.target.value })}
                                                     />
                                                 </div>
                                                 <div className="flex items-end h-10 pb-2">
@@ -708,7 +723,11 @@ export default function AdminPage() {
                                                     <h3 className="font-bold text-lg">{product.name}</h3>
                                                     <p className="text-xs text-muted-foreground">{product.category?.name}</p>
                                                 </div>
-                                                <span className="font-bold text-primary">₹{product.price}</span>
+                                                <div className="text-right">
+                                                    <span className="font-bold text-primary">
+                                                        {product.mrp ? `M.R.P. ₹${product.mrp}` : `₹${product.price}`}
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">

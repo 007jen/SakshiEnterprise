@@ -35,6 +35,7 @@ model Product {
     name        String
     description String?
     price       Float
+    mrp         Float? // Maximum Retail Price
     image       String? // path to the uploaded image
     inStock     Boolean  @default(true)
     categoryId  String

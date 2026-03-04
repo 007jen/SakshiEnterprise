@@ -26,6 +26,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  mrp?: number;
   image: string;
   inStock: boolean;
 }
@@ -374,8 +375,13 @@ export function HomePage() {
                       />
                     </div>
                     <CardContent className="p-4">
-                      <h3 className="mb-2 line-clamp-1">{product.name}</h3>
-                      <div className="flex justify-end items-center mt-auto">
+                      <h3 className="mb-2 line-clamp-1 h-6">{product.name}</h3>
+                      <div className="flex flex-col mb-4">
+                        <span className="font-bold text-accent">
+                          {product.mrp ? `M.R.P. ₹${product.mrp}` : `₹${product.price}`}
+                        </span>
+                      </div>
+                      <div className="flex justify-end items-center">
                         <Button variant="outline" size="sm">
                           View Details
                         </Button>

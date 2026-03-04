@@ -588,7 +588,7 @@ app.get('/api/products', async (req, res) => {
 
 app.post('/api/admin/products', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { name, description, price, categoryId, inStock } = req.body;
+        const { name, description, price, mrp, categoryId, inStock } = req.body;
         const imageUrl = req.file ? req.file.path : null;
 
 
@@ -597,6 +597,7 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
                 name,
                 description,
                 price: Number.parseFloat(price),
+                mrp: mrp ? Number.parseFloat(mrp) : null,
                 image: imageUrl,
                 category: { connect: { id: categoryId } },
                 inStock: inStock === 'true' || inStock === true,
@@ -612,12 +613,13 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
 app.patch('/api/admin/products/:id', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, categoryId, inStock } = req.body;
+        const { name, description, price, mrp, categoryId, inStock } = req.body;
 
         const updateData: any = {};
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = Number.parseFloat(price);
+        if (mrp !== undefined) updateData.mrp = mrp ? Number.parseFloat(mrp) : null;
         if (categoryId) updateData.categoryId = categoryId;
         if (inStock !== undefined) updateData.inStock = inStock === 'true' || inStock === true;
         if (req.file) updateData.image = req.file.path;

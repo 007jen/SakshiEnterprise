@@ -136,7 +136,15 @@ export function ProductPage() {
               </Badge>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4">{product.name}</h1>
-            <p className="text-2xl font-bold text-accent mb-4 sm:mb-6">₹{product.price}</p>
+            <div className="mb-4 sm:mb-6">
+              <p className="text-3xl font-bold text-accent">₹{product.price}</p>
+              {product.mrp && (
+                <p className="text-lg text-muted-foreground mb-1">
+                  M.R.P.: ₹{product.mrp}
+                </p>
+              )}
+              {/* <p className="text-xs text-muted-foreground mt-1 text-primary">Inclusive of all taxes</p> */}
+            </div>
             <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">{product.description}</p>
 
             {/* Customization Options */}
