@@ -287,7 +287,7 @@ export function ProductPage() {
               </Button>
             </div>
             <p className="text-xl font-bold text-primary mb-8">
-              Bulk orders and healthcare partnerships available. Contact us today!
+              For Bulk orders Please talk to our agent in Chatbox
             </p>
           </motion.div>
         </div>
