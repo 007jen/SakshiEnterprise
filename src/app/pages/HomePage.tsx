@@ -118,21 +118,21 @@ export function HomePage() {
         <div className="flex flex-col">
           {/* Image Content (Banner) */}
           {/* Image Content (Banner) */}
-          <div className="w-full overflow-hidden order-first mb-4 bg-[#f0fdf4] px-4 md:px-8 pt-6 md:pt-10 pb-4">
+          <div className="w-full overflow-hidden order-first">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.7 }}
                 className="w-full flex justify-center relative"
               >
                 <motion.img
                   src={slides[currentSlide].image}
                   alt={slides[currentSlide].title}
-                  className="h-auto max-h-[55vh] object-contain rounded-3xl shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500"
-                  animate={{ y: [0, -10, 0] }}
+                  className="w-full h-auto max-h-[60vh] object-cover transition-all duration-500"
+                  animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 />
               </motion.div>
