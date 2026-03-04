@@ -46,6 +46,7 @@ interface Category {
     name: string;
     description?: string;
     icon?: string;
+    logo?: string;
     products?: Product[];
 }
 
@@ -78,6 +79,7 @@ export default function AdminPage() {
         description: '',
         icon: 'Heart'
     });
+    const [selectedCategoryFile, setSelectedCategoryFile] = useState<File | null>(null);
 
     // Product Form State
     const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -141,6 +143,14 @@ export default function AdminPage() {
         if (!categoryForm.name.trim()) return;
         try {
             const token = await getToken();
+            const formData = new FormData();
+            formData.append('name', categoryForm.name);
+            formData.append('description', categoryForm.description);
+            formData.append('icon', categoryForm.icon);
+            if (selectedCategoryFile) {
+                formData.append('logo', selectedCategoryFile);
+            }
+
             const url = editingCategory
                 ? `${apiBaseUrl}/api/admin/categories/${editingCategory.id}`
                 : `${apiBaseUrl}/api/admin/categories`;
@@ -148,15 +158,15 @@ export default function AdminPage() {
             const res = await fetch(url, {
                 method: editingCategory ? 'PATCH' : 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(categoryForm)
+                body: formData
             });
 
             if (res.ok) {
                 toast.success(editingCategory ? 'Category updated' : 'Category added');
                 setCategoryForm({ name: '', description: '', icon: 'Heart' });
+                setSelectedCategoryFile(null);
                 setIsAddingCategory(false);
                 setEditingCategory(null);
                 fetchData();
@@ -442,15 +452,38 @@ export default function AdminPage() {
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="catDesc">Description</Label>
-                                                <Textarea
-                                                    id="catDesc"
-                                                    value={categoryForm.description}
-                                                    onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
-                                                    placeholder="Short description for the hover menu..."
-                                                    rows={2}
-                                                />
+                                            <div className="grid md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="catDesc">Description</Label>
+                                                    <Textarea
+                                                        id="catDesc"
+                                                        value={categoryForm.description}
+                                                        onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                                                        placeholder="Short description for the hover menu..."
+                                                        rows={2}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="catLogo">Category Logo (Brand Logo)</Label>
+                                                    <div className="flex items-center gap-4">
+                                                        <Input
+                                                            id="catLogo"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => setSelectedCategoryFile(e.target.files?.[0] || null)}
+                                                            className="flex-1"
+                                                        />
+                                                        {(selectedCategoryFile || editingCategory?.logo) && (
+                                                            <div className="w-12 h-12 rounded border border-primary/20 overflow-hidden bg-white">
+                                                                {selectedCategoryFile ? (
+                                                                    <img src={URL.createObjectURL(selectedCategoryFile)} alt="Preview" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <img src={editingCategory?.logo} alt="Current" className="w-full h-full object-cover" />
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="flex justify-end gap-3">
                                                 <Button type="button" variant="outline" onClick={() => { setIsAddingCategory(false); setEditingCategory(null); }}>
@@ -467,9 +500,20 @@ export default function AdminPage() {
                                         {categories.map((category) => (
                                             <div key={category.id} className="flex flex-col p-4 bg-muted/30 rounded-lg border border-primary/10">
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <h3 className="font-bold">{category.name}</h3>
-                                                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{category.id}</p>
+                                                    <div className="flex items-center gap-3">
+                                                        {category.logo ? (
+                                                            <div className="w-10 h-10 rounded border border-primary/20 overflow-hidden bg-white flex-shrink-0">
+                                                                <img src={category.logo} alt={category.name} className="w-full h-full object-contain p-1" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                                                                <span className="text-xs font-bold text-primary">{category.name.charAt(0)}</span>
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <h3 className="font-bold">{category.name}</h3>
+                                                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{category.id}</p>
+                                                        </div>
                                                     </div>
                                                     <span className="text-xs font-semibold bg-primary/10 px-2 py-1 rounded">{category.products?.length || 0} Products</span>
                                                 </div>
@@ -490,6 +534,7 @@ export default function AdminPage() {
                                                                 description: category.description || '',
                                                                 icon: category.icon || 'Gift'
                                                             });
+                                                            setSelectedCategoryFile(null);
                                                             setIsAddingCategory(false);
                                                         }}
                                                     >

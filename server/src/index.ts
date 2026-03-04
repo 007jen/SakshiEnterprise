@@ -456,12 +456,15 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-app.post('/api/admin/categories', requireAuth, async (req, res) => {
+app.post('/api/admin/categories', requireAuth, upload.single('logo'), async (req, res) => {
     try {
         const { id, name, description, icon } = req.body;
         if (!name) {
             return res.status(400).json({ error: 'Category name is required' });
         }
+
+        const logoUrl = req.file ? req.file.path : null;
+
         // Use name to derive ID if ID not provided (slugify simple version)
         const slug = id || name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
         const category = await prisma.category.create({
@@ -469,7 +472,8 @@ app.post('/api/admin/categories', requireAuth, async (req, res) => {
                 id: slug,
                 name,
                 description,
-                icon
+                icon,
+                logo: logoUrl
             }
         });
         res.status(201).json(category);
@@ -482,13 +486,19 @@ app.post('/api/admin/categories', requireAuth, async (req, res) => {
     }
 });
 
-app.patch('/api/admin/categories/:id', requireAuth, async (req, res) => {
+app.patch('/api/admin/categories/:id', requireAuth, upload.single('logo'), async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description, icon } = req.body;
+
+        const updateData: any = { name, description, icon };
+        if (req.file) {
+            updateData.logo = req.file.path;
+        }
+
         const category = await prisma.category.update({
             where: { id: id as string },
-            data: { name, description, icon }
+            data: updateData
         });
         res.json(category);
     } catch (error) {
@@ -500,6 +510,25 @@ app.patch('/api/admin/categories/:id', requireAuth, async (req, res) => {
 app.delete('/api/admin/categories/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
+
+        // 0. Find category to check for logo
+        const targetCategory = await prisma.category.findUnique({
+            where: { id: id as string },
+            select: { id: true, logo: true }
+        });
+
+        if (targetCategory?.logo) {
+            try {
+                if (targetCategory.logo.includes('cloudinary.com')) {
+                    const parts = targetCategory.logo.split('/');
+                    const filenameWithExtension = parts[parts.length - 1];
+                    const publicId = `sakshi_products/${filenameWithExtension.split('.')[0]}`;
+                    await cloudinary.uploader.destroy(publicId);
+                }
+            } catch (err) {
+                console.error(`Failed to delete category logo for ${id}:`, err);
+            }
+        }
 
         // 1. Find all products in this category to clean up their images
         const productsInTargetCategory = await prisma.product.findMany({

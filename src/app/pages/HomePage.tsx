@@ -89,10 +89,10 @@ export function HomePage() {
 
         if (catRes.ok) {
           const catData = await catRes.json();
-          // Filter only the new Ayurvedic brands for the homepage display
+          // Show categories that are in the predefined brand list OR have a logo uploaded in DB
           const brandNames = ['Zandu', 'Baidyanath', 'Sandu', 'Hamdard', 'Jinvar', 'Rivayu'];
-          const mappedBrands = catData.filter((c: any) => brandNames.includes(c.name));
-          setCategories(mappedBrands);
+          const mappedBrands = catData.filter((c: any) => brandNames.includes(c.name) || (c.logo && c.logo.trim() !== ''));
+          setCategories(mappedBrands.slice(0, 6));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -246,7 +246,7 @@ export function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {categories.map((category, index) => {
-              const logoSrc = localLogos[category.name] || (category.logo?.startsWith('http') ? category.logo : null);
+              const logoSrc = category.logo || localLogos[category.name];
 
               return (
                 <motion.div
