@@ -246,6 +246,11 @@ export function ProductPage() {
               </CardContent>
             </Card>
 
+            {/* Min Order Value */}
+            <div className="mb-2">
+              <span className="text-sm text-muted-foreground font-medium">Min. Order Value: ₹1000</span>
+            </div>
+
             {/* Quantity Selector */}
             <div className="mb-6 flex items-center space-x-4">
               <label htmlFor="quantity" className="font-semibold text-muted-foreground">Quantity:</label>
