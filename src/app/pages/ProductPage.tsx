@@ -287,7 +287,7 @@ export function ProductPage() {
               </Button>
             </div>
             <p className="text-xl font-bold text-primary mb-8">
-              For Bulk orders Please talk to our agent in Chatbox
+              For Bulk orders please talk to our agent in chatbox
             </p>
           </motion.div>
         </div>
