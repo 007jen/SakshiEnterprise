@@ -576,7 +576,7 @@ app.delete('/api/admin/categories/:id', requireAuth, async (req, res) => {
 app.get('/api/products', async (req, res) => {
     try {
         const products = await prisma.product.findMany({
-            include: { category: true },
+            include: { category: true, variants: true },
             orderBy: { createdAt: 'desc' },
         });
         res.json(products);
@@ -588,9 +588,10 @@ app.get('/api/products', async (req, res) => {
 
 app.post('/api/admin/products', requireAuth, upload.single('image'), async (req, res) => {
     try {
-        const { name, description, price, mrp, categoryId, inStock } = req.body;
+        const { name, description, price, mrp, categoryId, inStock, variants } = req.body;
         const imageUrl = req.file ? req.file.path : null;
 
+        const parsedVariants = variants ? JSON.parse(variants) : [];
 
         const product = await prisma.product.create({
             data: {
@@ -601,7 +602,15 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
                 image: imageUrl,
                 category: { connect: { id: categoryId } },
                 inStock: inStock === 'true' || inStock === true,
+                variants: {
+                    create: parsedVariants.map((v: any) => ({
+                        size: v.size,
+                        price: Number.parseFloat(v.price),
+                        mrp: v.mrp ? Number.parseFloat(v.mrp) : null,
+                    })),
+                },
             },
+            include: { variants: true },
         });
         res.status(201).json(product);
     } catch (error) {
@@ -613,7 +622,7 @@ app.post('/api/admin/products', requireAuth, upload.single('image'), async (req,
 app.patch('/api/admin/products/:id', requireAuth, upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, mrp, categoryId, inStock } = req.body;
+        const { name, description, price, mrp, categoryId, inStock, variants } = req.body;
 
         const updateData: any = {};
         if (name) updateData.name = name;
@@ -622,12 +631,27 @@ app.patch('/api/admin/products/:id', requireAuth, upload.single('image'), async 
         if (mrp !== undefined) updateData.mrp = mrp ? Number.parseFloat(mrp) : null;
         if (categoryId) updateData.categoryId = categoryId;
         if (inStock !== undefined) updateData.inStock = inStock === 'true' || inStock === true;
-        if (req.file) updateData.image = req.file.path;
+        if (req.file) {
+            updateData.image = req.file.path;
+        }
+
+        if (variants) {
+            const parsedVariants = JSON.parse(variants);
+            updateData.variants = {
+                deleteMany: {}, // Remove existing variants
+                create: parsedVariants.map((v: any) => ({
+                    size: v.size,
+                    price: Number.parseFloat(v.price),
+                    mrp: v.mrp ? Number.parseFloat(v.mrp) : null,
+                })),
+            };
+        }
 
 
         const product = await prisma.product.update({
             where: { id: id as string },
             data: updateData,
+            include: { variants: true },
         });
         res.json(product);
     } catch (error) {

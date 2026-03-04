@@ -31,19 +31,29 @@ model Category {
 }
 
 model Product {
-    id          String   @id @default(cuid())
+    id          String           @id @default(cuid())
     name        String
     description String?
     price       Float
     mrp         Float? // Maximum Retail Price
     image       String? // path to the uploaded image
-    inStock     Boolean  @default(true)
+    inStock     Boolean          @default(true)
     categoryId  String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    category    Category @relation(fields: [categoryId], references: [id])
+    createdAt   DateTime         @default(now())
+    updatedAt   DateTime         @updatedAt
+    category    Category         @relation(fields: [categoryId], references: [id])
+    variants    ProductVariant[]
 
     @@index([createdAt])
+}
+
+model ProductVariant {
+    id        String  @id @default(cuid())
+    productId String
+    size      String // e.g., "450ml", "1 Liter"
+    price     Float // Selling Price
+    mrp       Float? // Maximum Retail Price
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model QuoteRequest {

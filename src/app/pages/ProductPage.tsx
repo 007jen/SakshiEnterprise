@@ -18,6 +18,8 @@ export function ProductPage() {
   const [loading, setLoading] = useState(true);
   const { addToQuote } = useQuote();
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
@@ -51,6 +53,19 @@ export function ProductPage() {
     };
     if (productId) fetchProduct();
   }, [productId]);
+
+  useEffect(() => {
+    if (product && product.variants && product.variants.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    }
+  }, [product]);
+
+  const currentPrice = selectedVariant ? selectedVariant.price : product?.price;
+  const currentMrp = selectedVariant ? selectedVariant.mrp : product?.mrp;
+
+  const discount = currentMrp && currentPrice
+    ? Math.round(((currentMrp - currentPrice) / currentMrp) * 100)
+    : 0;
 
   if (loading) {
     return (
@@ -92,11 +107,12 @@ export function ProductPage() {
 
   const handleWhatsApp = () => {
     const rawNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
-    const message = `Hi, I'm interested in ${product.name}. Can you provide more information?`;
-    const whatsappLink = getWhatsAppLink(rawNumber, message);
+    const variantInfo = selectedVariant ? ` (Size: ${selectedVariant.size})` : '';
+    const message = `Hi, I'm interested in ${product.name}${variantInfo}. Can you provide more information?`;
 
-    if (whatsappLink) {
-      window.open(whatsappLink, '_blank');
+    const link = getWhatsAppLink(rawNumber, message);
+    if (link) {
+      window.open(link, '_blank');
     } else {
       console.warn('WhatsApp number not configured correctly in .env');
     }
@@ -116,12 +132,21 @@ export function ProductPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
+            className="relative"
           >
             <img
               src={formatProductImageUrl(product.image)}
               alt={product.name}
               className="w-full rounded-lg shadow-xl"
             />
+            {/* Dynamic Size Badge over Image */}
+            {selectedVariant && (
+              <div className="absolute top-6 right-6 w-20 h-20 rounded-full border-2 border-dashed border-primary/40 bg-white/80 backdrop-blur-sm flex items-center justify-center p-2 text-center animate-in fade-in zoom-in duration-300">
+                <span className="text-xs font-bold text-primary leading-tight">
+                  {selectedVariant.size}
+                </span>
+              </div>
+            )}
           </motion.div>
 
           {/* Product Details */}
@@ -137,15 +162,74 @@ export function ProductPage() {
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl mb-3 sm:mb-4">{product.name}</h1>
             <div className="mb-4 sm:mb-6">
-              <p className="text-3xl font-bold text-accent">₹{product.price}</p>
-              {product.mrp && (
-                <p className="text-lg text-muted-foreground mb-1">
-                  M.R.P.: ₹{product.mrp}
-                </p>
+              <p className="text-3xl font-bold text-[#2c3333] mb-1">₹{currentPrice}</p>
+              {currentMrp && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">M.R.P.: <span className="line-through">₹{currentMrp}</span></span>
+                  {discount > 0 && (
+                    <span className="text-sm text-[#2c3333] font-bold uppercase">
+                      {discount}% off
+                    </span>
+                  )}
+                </div>
               )}
-              {/* <p className="text-xs text-muted-foreground mt-1 text-primary">Inclusive of all taxes</p> */}
             </div>
-            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">{product.description}</p>
+            <div className="mb-4 sm:mb-6">
+              <div className={`text-sm sm:text-base text-muted-foreground relative ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
+                {product.description}
+              </div>
+              {product.description && product.description.length > 150 && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="text-primary font-bold text-sm mt-2 hover:underline focus:outline-none"
+                >
+                  {isDescriptionExpanded ? 'Read Less' : 'Read More'}
+                </button>
+              )}
+            </div>
+
+            {/* Pack Section */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">Pack</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {product.variants.map((v: any) => {
+                    const vDiscount = v.mrp && v.price
+                      ? Math.round(((v.mrp - v.price) / v.mrp) * 100)
+                      : 0;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => setSelectedVariant(v)}
+                        className={`flex flex-col rounded-xl border transition-all text-left overflow-hidden group ${selectedVariant?.id === v.id
+                          ? 'border-primary ring-1 ring-primary shadow-md'
+                          : 'border-black/10 bg-white hover:border-primary/30'
+                          }`}
+                      >
+                        <div className={`px-4 py-2 text-xs font-bold uppercase transition-colors ${selectedVariant?.id === v.id ? 'bg-[#2c3333] text-white' : 'bg-black/5 text-muted-foreground'
+                          }`}>
+                          {v.size}
+                        </div>
+                        <div className="p-4 flex-1">
+                          <div className="text-2xl font-extrabold text-[#2c3333] mb-1">₹{v.price}</div>
+                          {v.mrp && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground/60 line-through">₹{v.mrp}</span>
+                              {vDiscount > 0 && (
+                                <span className="text-xs text-[#2c3333] font-bold uppercase">
+                                  {vDiscount}% off
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Customization Options */}
             <Card className="mb-6 sm:mb-8 text-primary">
@@ -187,7 +271,7 @@ export function ProductPage() {
               <Button
                 size="lg"
                 className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 rounded-xl shadow-lg transition-all active:scale-95 text-lg"
-                onClick={() => addToQuote(product, quantity)}
+                onClick={() => addToQuote(product, quantity, selectedVariant)}
                 disabled={!product.inStock}
               >
                 Add to Cart

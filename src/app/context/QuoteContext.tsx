@@ -9,17 +9,19 @@ interface Product {
     category?: {
         name: string;
     };
+    variants?: { id: string; size: string; price: number; mrp?: number }[];
 }
 import { toast } from 'sonner';
 
 export interface QuoteItem extends Product {
     quantity: number;
     customNotes?: string;
+    selectedVariant?: { id: string; size: string; price: number; mrp?: number };
 }
 
 interface QuoteContextType {
     items: QuoteItem[];
-    addToQuote: (product: Product, quantity: number, customNotes?: string) => void;
+    addToQuote: (product: Product, quantity: number, selectedVariant?: any) => void;
     removeFromQuote: (productId: string) => void;
     clearQuote: () => void;
     quoteCount: number;
@@ -47,24 +49,36 @@ export function QuoteProvider({ children }: { readonly children: ReactNode }) {
         localStorage.setItem('sakshi_quote_cart', JSON.stringify(items));
     }, [items]);
 
-    const addToQuote = useCallback((product: Product, quantity: number, customNotes?: string) => {
+    const addToQuote = useCallback((product: Product, quantity: number, selectedVariant?: any) => {
         setItems((prev) => {
-            const existing = prev.find((item) => item.id === product.id);
+            const existing = prev.find((item) => (item.selectedVariant?.id === selectedVariant?.id) && (item.id === product.id));
+
             if (existing) {
                 toast.info("Updated quantity in Quote Cart");
                 return prev.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity, customNotes: customNotes || item.customNotes }
+                    (item.selectedVariant?.id === selectedVariant?.id) && (item.id === product.id)
+                        ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
+
             toast.success("Added to Quote Cart");
-            return [...prev, { ...product, quantity, customNotes }];
+            const newItem: QuoteItem = {
+                ...product,
+                quantity,
+                selectedVariant,
+                // Override base price if variant is selected for display/total purposes
+                price: selectedVariant ? selectedVariant.price : product.price
+            };
+            return [...prev, newItem];
         });
     }, []);
 
-    const removeFromQuote = useCallback((productId: string) => {
-        setItems((prev) => prev.filter((item) => item.id !== productId));
+    const removeFromQuote = useCallback((id: string) => {
+        setItems((prev) => prev.filter((item) => {
+            const itemId = item.selectedVariant ? `${item.id}-${item.selectedVariant.id}` : item.id;
+            return itemId !== id;
+        }));
         toast.success("Removed from Quote Cart");
     }, []);
 

@@ -166,10 +166,13 @@ export function QuotePage() {
                       <div className="flex justify-between items-start gap-2">
                         <div>
                           <h3 className="font-medium text-lg leading-tight mb-1 line-clamp-1">{item.name}</h3>
+                          {item.selectedVariant && (
+                            <p className="text-xs font-bold text-primary uppercase mb-1">Size: {item.selectedVariant.size}</p>
+                          )}
                           <p className="text-accent font-bold">₹{item.price}</p>
                         </div>
                         <button
-                          onClick={() => removeFromQuote(item.id)}
+                          onClick={() => removeFromQuote(item.selectedVariant ? `${item.id}-${item.selectedVariant.id}` : item.id)}
                           className="text-muted-foreground hover:text-red-500 transition-colors bg-red-50 p-2 rounded-full"
                         >
                           <Trash2 size={16} />

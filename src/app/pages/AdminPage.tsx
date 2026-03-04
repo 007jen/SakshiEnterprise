@@ -60,6 +60,7 @@ interface Product {
     inStock: boolean;
     categoryId: string;
     category?: Category;
+    variants?: { id?: string; size: string; price: string; mrp: string }[];
 }
 
 export default function AdminPage() {
@@ -91,7 +92,8 @@ export default function AdminPage() {
         price: '',
         mrp: '',
         categoryId: '',
-        inStock: true
+        inStock: true,
+        variants: [] as { id?: string; size: string; price: string; mrp: string }[]
     });
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -211,6 +213,7 @@ export default function AdminPage() {
             formData.append('mrp', productForm.mrp);
             formData.append('categoryId', productForm.categoryId);
             formData.append('inStock', String(productForm.inStock));
+            formData.append('variants', JSON.stringify(productForm.variants));
             if (selectedFile) {
                 formData.append('image', selectedFile);
             }
@@ -235,7 +238,8 @@ export default function AdminPage() {
                     price: '',
                     mrp: '',
                     categoryId: '',
-                    inStock: true
+                    inStock: true,
+                    variants: []
                 });
                 setSelectedFile(null);
                 setIsAddingProduct(false);
@@ -256,10 +260,35 @@ export default function AdminPage() {
             price: String(product.price),
             mrp: product.mrp ? String(product.mrp) : '',
             categoryId: product.categoryId,
-            inStock: product.inStock
+            inStock: product.inStock,
+            variants: product.variants?.map(v => ({
+                id: v.id,
+                size: v.size,
+                price: String(v.price),
+                mrp: v.mrp ? String(v.mrp) : ''
+            })) || []
         });
         setSelectedFile(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const addVariant = () => {
+        setProductForm({
+            ...productForm,
+            variants: [...productForm.variants, { size: '', price: '', mrp: '' }]
+        });
+    };
+
+    const removeVariant = (index: number) => {
+        const newVariants = [...productForm.variants];
+        newVariants.splice(index, 1);
+        setProductForm({ ...productForm, variants: newVariants });
+    };
+
+    const updateVariant = (index: number, field: string, value: string) => {
+        const newVariants = [...productForm.variants];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setProductForm({ ...productForm, variants: newVariants });
     };
 
     const handleDeleteProduct = async (id: string) => {
@@ -570,7 +599,7 @@ export default function AdminPage() {
                                     onClick={() => {
                                         setIsAddingProduct(!isAddingProduct);
                                         setEditingProduct(null);
-                                        setProductForm({ name: '', description: '', price: '', mrp: '', categoryId: '', inStock: true });
+                                        setProductForm({ name: '', description: '', price: '', mrp: '', categoryId: '', inStock: true, variants: [] });
                                         setSelectedFile(null);
                                     }}
                                     className="bg-primary text-primary-foreground"
@@ -624,9 +653,73 @@ export default function AdminPage() {
                                                 />
                                             </div>
 
-                                            <div className="grid md:grid-cols-3 gap-4">
+                                            <div className="space-y-4 border-t border-primary/10 pt-4">
+                                                <div className="flex justify-between items-center">
+                                                    <Label className="text-base font-bold text-primary">Product Sizes / Variants</Label>
+                                                    <Button type="button" variant="outline" size="sm" onClick={addVariant} className="h-8 border-primary/30 text-primary">
+                                                        <Plus size={14} className="mr-1" /> Add Size
+                                                    </Button>
+                                                </div>
+
+                                                {productForm.variants.length > 0 ? (
+                                                    <div className="space-y-3">
+                                                        {productForm.variants.map((v, idx) => (
+                                                            <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-white rounded-lg border border-primary/10 relative group">
+                                                                <div className="space-y-1">
+                                                                    <Label className="text-[10px] uppercase text-muted-foreground">Size (e.g. 450ml)</Label>
+                                                                    <Input
+                                                                        placeholder="Size"
+                                                                        value={v.size}
+                                                                        onChange={(e) => updateVariant(idx, 'size', e.target.value)}
+                                                                        className="h-9"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <Label className="text-[10px] uppercase text-muted-foreground">Price</Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder="Price"
+                                                                        value={v.price}
+                                                                        onChange={(e) => updateVariant(idx, 'price', e.target.value)}
+                                                                        className="h-9"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <Label className="text-[10px] uppercase text-muted-foreground">MRP</Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder="MRP"
+                                                                        value={v.mrp}
+                                                                        onChange={(e) => updateVariant(idx, 'mrp', e.target.value)}
+                                                                        className="h-9"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex items-end">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => removeVariant(idx)}
+                                                                        className="h-9 w-full text-red-500 hover:bg-red-50 hover:text-red-600"
+                                                                    >
+                                                                        <Trash2 size={14} className="mr-2" /> Remove
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-6 border-2 border-dashed border-primary/10 rounded-xl bg-white/50">
+                                                        <p className="text-sm text-muted-foreground">No sizes added. Click "Add Size" to create variants for this product.</p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid md:grid-cols-3 gap-4 border-t border-primary/10 pt-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="price">Selling Price *</Label>
+                                                    <Label htmlFor="price">Default Selling Price *</Label>
                                                     <Input
                                                         id="price"
                                                         type="number"
@@ -637,7 +730,7 @@ export default function AdminPage() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="mrp">MRP</Label>
+                                                    <Label htmlFor="mrp">Default MRP</Label>
                                                     <Input
                                                         id="mrp"
                                                         type="number"
@@ -723,10 +816,18 @@ export default function AdminPage() {
                                                     <h3 className="font-bold text-lg">{product.name}</h3>
                                                     <p className="text-xs text-muted-foreground">{product.category?.name}</p>
                                                 </div>
-                                                <div className="text-right">
-                                                    <span className="font-bold text-primary">
-                                                        {product.mrp ? `M.R.P. ₹${product.mrp}` : `₹${product.price}`}
+                                                <div className="text-right flex flex-col items-end">
+                                                    <span className="font-bold text-primary text-lg leading-tight">
+                                                        ₹{product.price}
                                                     </span>
+                                                    {product.mrp && Number(product.mrp) > Number(product.price) && (
+                                                        <div className="flex items-center gap-1 mt-0.5">
+                                                            <span className="text-[10px] text-muted-foreground line-through">₹{product.mrp}</span>
+                                                            <span className="text-[10px] text-primary font-bold uppercase">
+                                                                {Math.round(((Number(product.mrp) - Number(product.price)) / Number(product.mrp)) * 100)}% off
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
