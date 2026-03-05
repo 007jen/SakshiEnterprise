@@ -27,6 +27,7 @@ model Category {
     description String?
     icon        String?
     logo        String? // URL or path to the brand logo
+    isHidden    Boolean   @default(false)
     products    Product[]
 }
 

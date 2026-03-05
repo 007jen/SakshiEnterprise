@@ -122,8 +122,7 @@ export function ContactPage() {
                       <h3 className="mb-2">Visit Us</h3>
                       <p className="text-muted-foreground">
                         Sakshi Enterprise<br />
-                        A/502, Platinum Building, Near Momaya park,<br />
-                        Village Road, Bhandup West, Mumbai - 400078
+                        Mumbai - 400078
                       </p>
                     </div>
                   </div>

@@ -90,8 +90,8 @@ export function Footer() {
               <li className="flex items-start space-x-2">
                 <MapPin size={16} className="mt-1 flex-shrink-0" />
                 <span className="text-primary-foreground/80">
-                  A/502, Platinum Building, Near Momaya park,<br />
-                  Village Road, Bhandup West,<br />
+                  Sakshi
+                  ENTERPRISE<br />
                   Mumbai - 400078
                 </span>
               </li>

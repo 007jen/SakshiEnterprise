@@ -169,9 +169,10 @@ const optionalAuth = async (req: Request, res: Response, next: NextFunction) => 
                 };
             }
         } catch (err) {
-            // Token verification failed - invalid or expired
-            console.debug('Optional auth token verification failed.');
+            console.error('Optional auth error:', err);
         }
+    } else {
+        console.log('Optional auth: No Bearer token found');
     }
     next();
 };
@@ -444,12 +445,47 @@ app.patch('/api/quotes/:id/cancel', optionalAuth, async (req, res) => {
 // --- PROTECTED ADMIN ROUTES ---
 
 // Category Management
-app.get('/api/categories', async (req, res) => {
+app.get('/api/categories', optionalAuth, async (req, res) => {
     try {
+        const isAdminRequest = (req as any).auth?.userId ? true : false; // Simplistic - would need more rigor in prod
+        // In real use, we'd check if the user has admin role. 
+        // For this project, if they are logged in and in adminEmails, we'll show all.
+        // But since optionalAuth only populates if signed in, 
+        // we'll fetch all then filter if NOT admin or simply show all for admin.
         const categories = await prisma.category.findMany({
             include: { products: true },
         });
-        res.json(categories);
+
+        const auth = (req as any).auth;
+        let userEmail = auth?.claims?.email || auth?.claims?.primaryEmailAddress || auth?.claims?.email_address;
+
+        // If email not in claims, fetch from Clerk
+        if (!userEmail && auth?.userId) {
+            try {
+                const user = await clerkClient.users.getUser(auth.userId);
+                userEmail = user.primaryEmailAddress?.emailAddress;
+            } catch (err) {
+                console.error('Error fetching user from Clerk:', err);
+            }
+        }
+
+        const adminEmailEnv = process.env.ADMIN_EMAIL || '';
+        const adminEmails = adminEmailEnv.split(',').map(e => e.trim().toLowerCase());
+        const isAdmin = !!userEmail && adminEmails.includes(userEmail.toLowerCase());
+
+        console.log(`[AdminCheck] User: ${userEmail}, userId: ${auth?.userId}, isAdmin: ${isAdmin}`);
+
+        if (isAdmin) {
+            return res.json(categories);
+        }
+        const visibleCategories = categories
+            .filter(c => !c.isHidden)
+            .map(c => ({
+                ...c,
+                products: c.products.filter(p => !c.isHidden) // Products are implicitly hidden if category is
+            }));
+
+        res.json(visibleCategories);
     } catch (error) {
         console.error('Fetch categories error:', error);
         res.status(500).json({ error: 'Failed to fetch categories' });
@@ -458,7 +494,7 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/admin/categories', requireAuth, upload.single('logo'), async (req, res) => {
     try {
-        const { id, name, description, icon } = req.body;
+        const { id, name, description, icon, isHidden } = req.body;
         if (!name) {
             return res.status(400).json({ error: 'Category name is required' });
         }
@@ -473,7 +509,8 @@ app.post('/api/admin/categories', requireAuth, upload.single('logo'), async (req
                 name,
                 description,
                 icon,
-                logo: logoUrl
+                logo: logoUrl,
+                isHidden: isHidden === 'true' || isHidden === true,
             }
         });
         res.status(201).json(category);
@@ -489,9 +526,12 @@ app.post('/api/admin/categories', requireAuth, upload.single('logo'), async (req
 app.patch('/api/admin/categories/:id', requireAuth, upload.single('logo'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, icon } = req.body;
+        const { name, description, icon, isHidden } = req.body;
 
         const updateData: any = { name, description, icon };
+        if (isHidden !== undefined) {
+            updateData.isHidden = isHidden === 'true' || isHidden === true;
+        }
         if (req.file) {
             updateData.logo = req.file.path;
         }
@@ -573,13 +613,35 @@ app.delete('/api/admin/categories/:id', requireAuth, async (req, res) => {
 });
 
 // Product Management
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', optionalAuth, async (req, res) => {
     try {
+        const auth = (req as any).auth;
+        let userEmail = auth?.claims?.email || auth?.claims?.primary_email || auth?.claims?.email_address;
+
+        if (!userEmail && auth?.userId) {
+            try {
+                const user = await clerkClient.users.getUser(auth.userId);
+                userEmail = user.primaryEmailAddress?.emailAddress;
+            } catch (err) {
+                console.error('Error fetching user from Clerk:', err);
+            }
+        }
+
+        const adminEmailEnv = process.env.ADMIN_EMAIL || '';
+        const adminEmails = adminEmailEnv.split(',').map(e => e.trim().toLowerCase());
+        const isAdmin = userEmail && adminEmails.includes(userEmail?.toLowerCase());
+
         const products = await prisma.product.findMany({
             include: { category: true, variants: true },
             orderBy: { createdAt: 'desc' },
         });
-        res.json(products);
+
+        if (isAdmin) {
+            return res.json(products);
+        }
+
+        const visibleProducts = products.filter(p => !p.category.isHidden);
+        res.json(visibleProducts);
     } catch (error) {
         console.error('Fetch products error:', error);
         res.status(500).json({ error: 'Failed to fetch products' });
@@ -742,19 +804,40 @@ app.get('/api/admin/quotes', requireAuth, async (req, res) => {
     }
 });
 
-app.get('/api/search', async (req, res) => {
+app.get('/api/search', optionalAuth, async (req, res) => {
     try {
         const { q } = req.query;
         if (!q || typeof q !== 'string') {
             return res.json([]);
         }
 
+        const auth = (req as any).auth;
+        let userEmail = auth?.claims?.email || auth?.claims?.primary_email || auth?.claims?.email_address;
+
+        if (!userEmail && auth?.userId) {
+            try {
+                const user = await clerkClient.users.getUser(auth.userId);
+                userEmail = user.primaryEmailAddress?.emailAddress;
+            } catch (err) {
+                console.error('Search: Error fetching user from Clerk:', err);
+            }
+        }
+
+        const adminEmailEnv = process.env.ADMIN_EMAIL || '';
+        const adminEmails = adminEmailEnv.split(',').map(e => e.trim().toLowerCase());
+        const isAdmin = !!userEmail && adminEmails.includes(userEmail.toLowerCase());
+
         const products = await prisma.product.findMany({
             where: {
-                OR: [
-                    { name: { contains: q, mode: 'insensitive' } },
-                    { description: { contains: q, mode: 'insensitive' } },
-                    { category: { name: { contains: q, mode: 'insensitive' } } }
+                AND: [
+                    isAdmin ? {} : { category: { isHidden: false } },
+                    {
+                        OR: [
+                            { name: { contains: q, mode: 'insensitive' } },
+                            { description: { contains: q, mode: 'insensitive' } },
+                            { category: { name: { contains: q, mode: 'insensitive' } } }
+                        ]
+                    }
                 ]
             },
             include: { category: true },

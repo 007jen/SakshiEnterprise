@@ -47,6 +47,7 @@ interface Category {
     description?: string;
     icon?: string;
     logo?: string;
+    isHidden: boolean;
     products?: Product[];
 }
 
@@ -79,7 +80,8 @@ export default function AdminPage() {
     const [categoryForm, setCategoryForm] = useState({
         name: '',
         description: '',
-        icon: 'Heart'
+        icon: 'Heart',
+        isHidden: false
     });
     const [selectedCategoryFile, setSelectedCategoryFile] = useState<File | null>(null);
 
@@ -108,8 +110,8 @@ export default function AdminPage() {
             const [leadsRes, quotesRes, categoriesRes, productsRes] = await Promise.all([
                 fetch(`${apiBaseUrl}/api/admin/leads`, { headers }),
                 fetch(`${apiBaseUrl}/api/admin/quotes`, { headers }),
-                fetch(`${apiBaseUrl}/api/categories`),
-                fetch(`${apiBaseUrl}/api/products`)
+                fetch(`${apiBaseUrl}/api/categories`, { headers }),
+                fetch(`${apiBaseUrl}/api/products`, { headers })
             ]);
 
             if (leadsRes.status === 403 || quotesRes.status === 403) {
@@ -151,6 +153,7 @@ export default function AdminPage() {
             formData.append('name', categoryForm.name);
             formData.append('description', categoryForm.description);
             formData.append('icon', categoryForm.icon);
+            formData.append('isHidden', String(categoryForm.isHidden));
             if (selectedCategoryFile) {
                 formData.append('logo', selectedCategoryFile);
             }
@@ -169,7 +172,7 @@ export default function AdminPage() {
 
             if (res.ok) {
                 toast.success(editingCategory ? 'Category updated' : 'Category added');
-                setCategoryForm({ name: '', description: '', icon: 'Heart' });
+                setCategoryForm({ name: '', description: '', icon: 'Heart', isHidden: false });
                 setSelectedCategoryFile(null);
                 setIsAddingCategory(false);
                 setEditingCategory(null);
@@ -518,6 +521,17 @@ export default function AdminPage() {
                                                         )}
                                                     </div>
                                                 </div>
+                                                <div className="flex items-center gap-2 pt-2">
+                                                    <label className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={categoryForm.isHidden}
+                                                            onChange={(e) => setCategoryForm({ ...categoryForm, isHidden: e.target.checked })}
+                                                            className="w-4 h-4 accent-primary"
+                                                        />
+                                                        <span className="text-sm font-medium">Hide Category from Users</span>
+                                                    </label>
+                                                </div>
                                             </div>
                                             <div className="flex justify-end gap-3">
                                                 <Button type="button" variant="outline" onClick={() => { setIsAddingCategory(false); setEditingCategory(null); }}>
@@ -546,7 +560,12 @@ export default function AdminPage() {
                                                         )}
                                                         <div>
                                                             <h3 className="font-bold">{category.name}</h3>
-                                                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{category.id}</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{category.id}</p>
+                                                                {category.isHidden && (
+                                                                    <span className="text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-bold uppercase">Hidden</span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <span className="text-xs font-semibold bg-primary/10 px-2 py-1 rounded">{category.products?.length || 0} Products</span>
@@ -566,7 +585,8 @@ export default function AdminPage() {
                                                             setCategoryForm({
                                                                 name: category.name,
                                                                 description: category.description || '',
-                                                                icon: category.icon || 'Gift'
+                                                                icon: category.icon || 'Gift',
+                                                                isHidden: category.isHidden || false
                                                             });
                                                             setSelectedCategoryFile(null);
                                                             setIsAddingCategory(false);
