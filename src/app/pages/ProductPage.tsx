@@ -250,7 +250,7 @@ export function ProductPage() {
 
             {/* Min Order Value */}
             <div className="mb-2">
-              <span className="text-sm text-muted-foreground font-medium">Min. Order Value: ₹1000</span>
+              <span className="text-sm text-muted-foreground font-medium">Min. Order Value: ₹500</span>
             </div>
 
             {/* Quantity Selector */}
